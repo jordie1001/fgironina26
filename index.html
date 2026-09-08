@@ -65,6 +65,77 @@
       padding-bottom: 80px;
     }
 
+    /* Targeta del calendari */
+    .calendar-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+      border-top: 4px solid var(--accent-yellow);
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .day-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding-bottom: 8px;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .day-cell:hover {
+      background-color: #f0f0f0;
+    }
+
+    .day-cell.selected {
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+
+    .day-cell.has-event {
+      background-color: var(--accent-yellow);
+      color: #000000;
+      font-weight: 700;
+    }
+
+    .day-cell.has-event.selected {
+      box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--accent-yellow);
+    }
+
+    /* Secció d'esdeveniments */
     .events-section {
       background: var(--card-bg);
       border-radius: 12px;
@@ -74,9 +145,9 @@
 
     .section-title {
       font-family: 'Oswald', sans-serif;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: var(--primary);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       font-weight: 600;
       text-transform: uppercase;
     }
@@ -92,27 +163,19 @@
       margin-bottom: 12px;
     }
 
-    .event-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
     .event-title {
       font-family: 'Oswald', sans-serif;
       font-size: 1.2rem;
       font-weight: 700;
       color: var(--primary);
       text-transform: uppercase;
+      margin-bottom: 10px;
     }
 
-    /* Targetes de detalls personalitzades */
     .details-grid {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 10px;
       padding-top: 10px;
       border-top: 1px dashed var(--border-color);
     }
@@ -142,6 +205,13 @@
       flex: 1;
     }
 
+    .empty-state {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 12px 0;
+    }
+
     .footer-banner {
       position: absolute;
       bottom: 0;
@@ -167,43 +237,16 @@
   <header>Calendari Fires 2026</header>
   
   <div class="content">
-    <div class="events-section">
-      <div class="section-title">Esdeveniment: 23 d'Octubre</div>
-      
-      <!-- Exemple de renderització visual de l'esdeveniment -->
-      <div class="event-card">
-        <div class="event-header">
-          <span class="event-title">INAUGURACIÓ FIRES</span>
-        </div>
-
-        <div class="details-grid">
-          <div class="detail-item">
-            <span class="detail-label">Hora de Plantada:</span>
-            <span class="detail-value">16:00h</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Lloc de Plantada:</span>
-            <span class="detail-value">Plaça Hotel Carlemany</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Inici Cercavila:</span>
-            <span class="detail-value">17:30h</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Recorregut:</span>
-            <span class="detail-value">Plaça Hotel Carlemany, Joan Maragall, Plaça Catalunya, Plaça del Vi</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Pregó:</span>
-            <span class="detail-value">20:00h</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Balls:</span>
-            <span class="detail-value">21:00h</span>
-          </div>
-        </div>
+    <div class="calendar-card">
+      <div class="calendar-header">
+        <span id="monthYearDisplay">Octubre 2026</span>
       </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
 
+    <div class="events-section">
+      <div class="section-title" id="selectedDateTitle">Esdeveniments</div>
+      <div id="eventsList"></div>
     </div>
   </div>
 
@@ -211,6 +254,129 @@
     Fal·lera Gironina
   </div>
 </div>
+
+<script>
+  // Simulació de les dades obtingudes de la descripció de Google Calendar
+  const eventsData = {
+    "2026-10-23": [
+      {
+        titol: "INAUGURACIÓ FIRES",
+        descriptionRaw: JSON.stringify({
+          "hora_plantada": "16:00h",
+          "lloc_plantada": "Plaça Hotel Carlemany",
+          "inici_cercavila": "17:30h",
+          "recorregut": "Plaça Hotel Carlemany, Joan Maragall, Plaça Catalunya, Plaça del Vi",
+          "prego": "20:00h",
+          "balls": "21:00h"
+        })
+      }
+    ]
+  };
+
+  let selectedDateKey = "2026-10-23";
+
+  function renderCalendar() {
+    const grid = document.getElementById("calendarGrid");
+    grid.innerHTML = "";
+
+    const daysOfWeek = ["Dl", "Dt", "Dc", "Dj", "Dv", "Ds", "Dg"];
+    daysOfWeek.forEach(day => {
+      const el = document.createElement("div");
+      el.className = "day-name";
+      el.innerText = day;
+      grid.appendChild(el);
+    });
+
+    // Octubre 2026 comença en dijous (offset 3)
+    const offsetDays = 3;
+    const totalDays = 31;
+
+    for (let i = 0; i < offsetDays; i++) {
+      grid.appendChild(document.createElement("div"));
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+      const dayStr = day < 10 ? `0${day}` : `${day}`;
+      const dateKey = `2026-10-${dayStr}`;
+
+      const cell = document.createElement("div");
+      cell.className = "day-cell";
+      cell.innerText = day;
+
+      if (eventsData[dateKey]) {
+        cell.classList.add("has-event");
+      }
+
+      if (dateKey === selectedDateKey) {
+        cell.classList.add("selected");
+      }
+
+      cell.onclick = () => selectDate(dateKey);
+      grid.appendChild(cell);
+    }
+  }
+
+  function selectDate(dateKey) {
+    selectedDateKey = dateKey;
+    renderCalendar();
+    renderEvents();
+  }
+
+  function renderEvents() {
+    const listContainer = document.getElementById("eventsList");
+    const titleContainer = document.getElementById("selectedDateTitle");
+
+    const parts = selectedDateKey.split("-");
+    titleContainer.innerText = `Esdeveniments (${parts[2]}/${parts[1]}/${parts[0]})`;
+
+    listContainer.innerHTML = "";
+
+    const events = eventsData[selectedDateKey];
+
+    if (!events || events.length === 0) {
+      listContainer.innerHTML = `<div class="empty-state">No hi ha cap esdeveniment programat per a aquest dia.</div>`;
+      return;
+    }
+
+    events.forEach(event => {
+      const card = document.createElement("div");
+      card.className = "event-card";
+
+      let detailsHtml = "";
+
+      try {
+        // Intenta convertir la descripció JSON en objecte de dades
+        const fields = JSON.parse(event.descriptionRaw);
+
+        detailsHtml += `<div class="details-grid">`;
+        for (const [key, value] of Object.entries(fields)) {
+          // Normalitza el nom del camp per a la visualització
+          const labelFormatted = key.replace(/_/g, " ");
+          detailsHtml += `
+            <div class="detail-item">
+              <span class="detail-label">${labelFormatted}:</span>
+              <span class="detail-value">${value}</span>
+            </div>`;
+        }
+        detailsHtml += `</div>`;
+
+      } catch (e) {
+        // Si no és un JSON vàlid, mostra el text tal com està
+        detailsHtml = `<div style="margin-top:8px; font-size:0.9rem;">${event.descriptionRaw}</div>`;
+      }
+
+      card.innerHTML = `
+        <div class="event-title">${event.titol}</div>
+        ${detailsHtml}
+      `;
+
+      listContainer.appendChild(card);
+    });
+  }
+
+  renderCalendar();
+  renderEvents();
+</script>
 
 </body>
 </html>
