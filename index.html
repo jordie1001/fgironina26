@@ -14,10 +14,7 @@
       --card-bg: #ffffff;
       --primary: #2c3e50;
       --accent-yellow: #ffc600;
-      --accent-yellow-light: #fff9db;
       --text-dark: #222222;
-      --text-muted: #666666;
-      --border-color: #e2e8f0;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,162 +57,27 @@
 
     .content {
       flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      padding-bottom: 80px;
+      padding: 12px;
+      padding-bottom: 75px;
+      display: flex;
+      flex-direction: column;
     }
 
-    .calendar-card {
+    /* Contenidor adaptatiu per a l'iframe */
+    .iframe-container {
+      width: 100%;
+      height: 100%;
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 16px;
+      overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
       border-top: 4px solid var(--accent-yellow);
     }
 
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      font-family: 'Oswald', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--primary);
-      text-transform: uppercase;
-    }
-
-    .nav-btn {
-      background: var(--primary);
-      color: var(--accent-yellow);
-      border: none;
-      padding: 4px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: 'Oswald', sans-serif;
-      font-size: 1rem;
-      font-weight: bold;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-      text-align: center;
-    }
-
-    .day-name {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 500;
-      padding-bottom: 8px;
-    }
-
-    .day-cell {
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Oswald', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 500;
-      border-radius: 50%;
-      cursor: pointer;
-      position: relative;
-      user-select: none;
-      transition: all 0.2s ease;
-    }
-
-    .day-cell:hover { background-color: #f0f0f0; }
-
-    .day-cell.selected { box-shadow: 0 0 0 2px var(--primary); }
-
-    .day-cell.has-event {
-      background-color: var(--accent-yellow);
-      color: #000000;
-      font-weight: 700;
-    }
-
-    .day-cell.has-event.selected {
-      box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--accent-yellow);
-    }
-
-    .events-section {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .section-title {
-      font-family: 'Oswald', sans-serif;
-      font-size: 1.15rem;
-      color: var(--primary);
-      margin-bottom: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .event-card {
-      border-left: 5px solid var(--accent-yellow);
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-left-width: 5px;
-      border-left-color: var(--accent-yellow);
-      border-radius: 8px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-
-    .event-title {
-      font-family: 'Oswald', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--primary);
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .details-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-top: 10px;
-      border-top: 1px dashed var(--border-color);
-    }
-
-    .detail-item {
-      display: flex;
-      align-items: flex-start;
-      background-color: var(--accent-yellow-light);
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-    }
-
-    .detail-label {
-      font-family: 'Oswald', sans-serif;
-      font-weight: 600;
-      color: var(--primary);
-      min-width: 130px;
-      text-transform: uppercase;
-      font-size: 0.85rem;
-      letter-spacing: 0.3px;
-    }
-
-    .detail-value {
-      color: var(--text-dark);
-      font-weight: 500;
-      flex: 1;
-    }
-
-    .empty-state {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      text-align: center;
-      padding: 12px 0;
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
     }
 
     .footer-banner {
@@ -243,20 +105,8 @@
   <header>Calendari Fires 2026</header>
   
   <div class="content">
-    <div class="calendar-card">
-      <div class="calendar-header">
-        <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
-        <span id="monthYearDisplay">Carregant...</span>
-        <button class="nav-btn" onclick="changeMonth(1)">&gt;</button>
-      </div>
-      <div class="calendar-grid" id="calendarGrid"></div>
-    </div>
-
-    <div class="events-section">
-      <div class="section-title" id="selectedDateTitle">Esdeveniments</div>
-      <div id="eventsList">
-        <div class="empty-state">Carregant esdeveniments de Google Calendar...</div>
-      </div>
+    <div class="iframe-container">
+      <iframe src="https://calendar.google.com/calendar/embed?src=falleragironina%40gmail.com&ctz=Europe%2FMadrid&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0" frameborder="0" scrolling="no"></iframe>
     </div>
   </div>
 
@@ -264,168 +114,6 @@
     Fal·lera Gironina
   </div>
 </div>
-
-<script>
-  const API_KEY = "AIzaSyDu9KdgDjl34V_1vnKaBCfttsP0TD8sFQ";
-  const CALENDAR_ID = "falleragironina@gmail.com";
-
-  let currentYear = 2026;
-  let currentMonth = 9; // Octubre (0-indexed: 9 = Octubre)
-  let selectedDateKey = "2026-10-23";
-  let eventsData = {};
-
-  const monthNames = [
-    "Gener", "Febrer", "Març", "Abril", "Maig", "Juny", 
-    "Juliol", "Agost", "Setembre", "Octubre", "Novembre", "Desembre"
-  ];
-
-  async function fetchGoogleCalendarEvents() {
-    const timeMin = new Date(currentYear, currentMonth, 1).toISOString();
-    const timeMax = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59).toISOString();
-
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      eventsData = {};
-
-      if (data.items) {
-        data.items.forEach(item => {
-          const start = item.start.date || item.start.dateTime;
-          if (start) {
-            const dateKey = start.split("T")[0];
-            if (!eventsData[dateKey]) eventsData[dateKey] = [];
-
-            eventsData[dateKey].push({
-              titol: item.summary || "Sense títol",
-              descriptionRaw: item.description || ""
-            });
-          }
-        });
-      }
-
-      renderCalendar();
-      renderEvents();
-    } catch (error) {
-      console.error("Error carregant esdeveniments:", error);
-      document.getElementById("eventsList").innerHTML = `<div class="empty-state">Error en carregar les dades de Google Calendar. Comprova la connexió.</div>`;
-    }
-  }
-
-  function renderCalendar() {
-    document.getElementById("monthYearDisplay").innerText = `${monthNames[currentMonth]} ${currentYear}`;
-    
-    const grid = document.getElementById("calendarGrid");
-    grid.innerHTML = "";
-
-    const daysOfWeek = ["Dl", "Dt", "Dc", "Dj", "Dv", "Ds", "Dg"];
-    daysOfWeek.forEach(day => {
-      const el = document.createElement("div");
-      el.className = "day-name";
-      el.innerText = day;
-      grid.appendChild(el);
-    });
-
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    const offsetDays = (firstDay === 0 ? 6 : firstDay - 1);
-    const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-    for (let i = 0; i < offsetDays; i++) {
-      grid.appendChild(document.createElement("div"));
-    }
-
-    for (let day = 1; day <= totalDays; day++) {
-      const dayStr = day < 10 ? `0${day}` : `${day}`;
-      const monthStr = (currentMonth + 1) < 10 ? `0${currentMonth + 1}` : `${currentMonth + 1}`;
-      const dateKey = `${currentYear}-${monthStr}-${dayStr}`;
-
-      const cell = document.createElement("div");
-      cell.className = "day-cell";
-      cell.innerText = day;
-
-      if (eventsData[dateKey]) cell.classList.add("has-event");
-      if (dateKey === selectedDateKey) cell.classList.add("selected");
-
-      cell.onclick = () => selectDate(dateKey);
-      grid.appendChild(cell);
-    }
-  }
-
-  function changeMonth(delta) {
-    currentMonth += delta;
-    if (currentMonth < 0) {
-      currentMonth = 11;
-      currentYear--;
-    } else if (currentMonth > 11) {
-      currentMonth = 0;
-      currentYear++;
-    }
-    fetchGoogleCalendarEvents();
-  }
-
-  function selectDate(dateKey) {
-    selectedDateKey = dateKey;
-    renderCalendar();
-    renderEvents();
-  }
-
-  function renderEvents() {
-    const listContainer = document.getElementById("eventsList");
-    const titleContainer = document.getElementById("selectedDateTitle");
-
-    const parts = selectedDateKey.split("-");
-    titleContainer.innerText = `Esdeveniments (${parts[2]}/${parts[1]}/${parts[0]})`;
-
-    listContainer.innerHTML = "";
-    const events = eventsData[selectedDateKey];
-
-    if (!events || events.length === 0) {
-      listContainer.innerHTML = `<div class="empty-state">No hi ha cap esdeveniment programat per a aquest dia.</div>`;
-      return;
-    }
-
-    events.forEach(event => {
-      const card = document.createElement("div");
-      card.className = "event-card";
-
-      let detailsHtml = "";
-
-      // Neteja d'etiquetes HTML que Google Calendar sol introduir automàticament a les descripcions
-      let cleanDescription = event.descriptionRaw
-        .replace(/<br\s*[\/]?>/gi, "")
-        .replace(/<\/?[^>]+(>|$)/g, "")
-        .trim();
-
-      try {
-        const fields = JSON.parse(cleanDescription);
-        detailsHtml += `<div class="details-grid">`;
-        for (const [key, value] of Object.entries(fields)) {
-          const labelFormatted = key.replace(/_/g, " ");
-          detailsHtml += `
-            <div class="detail-item">
-              <span class="detail-label">${labelFormatted}:</span>
-              <span class="detail-value">${value}</span>
-            </div>`;
-        }
-        detailsHtml += `</div>`;
-      } catch (e) {
-        detailsHtml = `<div style="margin-top:8px; font-size:0.9rem;">${cleanDescription || 'Sense detalls addicionals.'}</div>`;
-      }
-
-      card.innerHTML = `
-        <div class="event-title">${event.titol}</div>
-        ${detailsHtml}
-      `;
-
-      listContainer.appendChild(card);
-    });
-  }
-
-  // Inicialització automàtica
-  fetchGoogleCalendarEvents();
-</script>
 
 </body>
 </html>
