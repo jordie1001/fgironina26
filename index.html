@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calendari Fires 2026</title>
-  <!-- Importació de la tipografia Oswald -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,17 +14,13 @@
       --card-bg: #ffffff;
       --primary: #2c3e50;
       --accent-yellow: #ffc600;
-      --accent-yellow-light: #fff8d6;
+      --accent-yellow-light: #fff9db;
       --text-dark: #222222;
       --text-muted: #666666;
-      --border-color: #e0e0e0;
+      --border-color: #e2e8f0;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: #1a1a1a;
@@ -36,7 +31,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    /* Contenidor amb format de pantalla de mòbil */
     .app-container {
       width: 100%;
       max-width: 414px;
@@ -50,7 +44,6 @@
       position: relative;
     }
 
-    /* Capçalera superior */
     header {
       background-color: var(--primary);
       color: var(--accent-yellow);
@@ -65,86 +58,13 @@
       z-index: 10;
     }
 
-    /* Àrea de contingut amb desplaçament */
     .content {
       flex: 1;
       overflow-y: auto;
       padding: 16px;
-      padding-bottom: 80px; /* Espai per no tapar contingut amb el banner fix */
+      padding-bottom: 80px;
     }
 
-    /* Targeta del calendari */
-    .calendar-card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
-      border-top: 4px solid var(--accent-yellow);
-    }
-
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      font-family: 'Oswald', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--primary);
-      text-transform: uppercase;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-      text-align: center;
-    }
-
-    .day-name {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 500;
-      padding-bottom: 8px;
-    }
-
-    .day-cell {
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Oswald', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 500;
-      border-radius: 50%;
-      cursor: pointer;
-      position: relative;
-      user-select: none;
-      transition: all 0.2s ease;
-    }
-
-    .day-cell:hover {
-      background-color: #f0f0f0;
-    }
-
-    .day-cell.selected {
-      box-shadow: 0 0 0 2px var(--primary);
-    }
-
-    /* Cercle groc destacat per als dies amb esdeveniment */
-    .day-cell.has-event {
-      background-color: var(--accent-yellow);
-      color: #000000;
-      font-weight: 700;
-    }
-
-    .day-cell.has-event.selected {
-      box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--accent-yellow);
-    }
-
-    /* Secció d'esdeveniments del dia */
     .events-section {
       background: var(--card-bg);
       border-radius: 12px;
@@ -154,83 +74,74 @@
 
     .section-title {
       font-family: 'Oswald', sans-serif;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       color: var(--primary);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
-    .event-item {
+    .event-card {
       border-left: 5px solid var(--accent-yellow);
-      background-color: var(--accent-yellow-light);
-      padding: 12px 14px;
-      border-radius: 0 8px 8px 0;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .event-item:hover {
-      background-color: #ffefa3;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-left-width: 5px;
+      border-left-color: var(--accent-yellow);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
 
     .event-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 10px;
     }
 
     .event-title {
       font-family: 'Oswald', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text-dark);
-      letter-spacing: 0.3px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
     }
 
-    .event-time {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: #444444;
-      background: var(--accent-yellow);
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    /* Detalls extres de l'esdeveniment */
-    .event-details {
+    /* Targetes de detalls personalitzades */
+    .details-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       margin-top: 10px;
       padding-top: 10px;
-      border-top: 1px dashed #d1c170;
-      display: none;
-      font-size: 0.88rem;
-      color: var(--text-dark);
+      border-top: 1px dashed var(--border-color);
     }
 
-    .event-details.open {
-      display: block;
-    }
-
-    .detail-row {
-      margin-bottom: 4px;
+    .detail-item {
+      display: flex;
+      align-items: flex-start;
+      background-color: var(--accent-yellow-light);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
     }
 
     .detail-label {
-      font-weight: 700;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 600;
       color: var(--primary);
+      min-width: 130px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
     }
 
-    .empty-state {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      text-align: center;
-      padding: 12px 0;
+    .detail-value {
+      color: var(--text-dark);
+      font-weight: 500;
+      flex: 1;
     }
 
-    /* Banner inferior fixat */
     .footer-banner {
       position: absolute;
       bottom: 0;
@@ -256,174 +167,50 @@
   <header>Calendari Fires 2026</header>
   
   <div class="content">
-    <!-- Targeta Calendari -->
-    <div class="calendar-card">
-      <div class="calendar-header">
-        <span id="monthYearDisplay">Setembre 2026</span>
-      </div>
-      <div class="calendar-grid" id="calendarGrid">
-        <!-- Generat amb JavaScript -->
-      </div>
-    </div>
-
-    <!-- Secció Esdeveniments del Dia -->
     <div class="events-section">
-      <div class="section-title" id="selectedDateTitle">Esdeveniments</div>
-      <div id="eventsList">
-        <!-- Esdeveniments generats dinàmicament -->
+      <div class="section-title">Esdeveniment: 23 d'Octubre</div>
+      
+      <!-- Exemple de renderització visual de l'esdeveniment -->
+      <div class="event-card">
+        <div class="event-header">
+          <span class="event-title">INAUGURACIÓ FIRES</span>
+        </div>
+
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Hora de Plantada:</span>
+            <span class="detail-value">16:00h</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Lloc de Plantada:</span>
+            <span class="detail-value">Plaça Hotel Carlemany</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Inici Cercavila:</span>
+            <span class="detail-value">17:30h</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Recorregut:</span>
+            <span class="detail-value">Plaça Hotel Carlemany, Joan Maragall, Plaça Catalunya, Plaça del Vi</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Pregó:</span>
+            <span class="detail-value">20:00h</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Balls:</span>
+            <span class="detail-value">21:00h</span>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Banner fixat a la part inferior -->
   <div class="footer-banner">
     Fal·lera Gironina
   </div>
 </div>
-
-<script>
-  const eventsData = {
-    "2026-09-10": [
-      {
-        id: 1,
-        titol: "Reunió d'organització",
-        hora: "10:00",
-        lloc: "Local social",
-        responsable: "Comissió de Fires",
-        notes: "Revisió del recorregut i horaris de la cercavila."
-      }
-    ],
-    "2026-09-15": [
-      {
-        id: 2,
-        titol: "Assaig de colla",
-        hora: "18:30",
-        lloc: "Plaça dels Gegants",
-        vestuari: "Camisa de la colla",
-        notes: "Preparació de noves ballades per les Fires."
-      },
-      {
-        id: 3,
-        titol: "Sopar de germanor",
-        hora: "21:00",
-        lloc: "Local social",
-        notes: "Cal confirmar assistència abans del dia 12."
-      }
-    ],
-    "2026-09-22": [
-      {
-        id: 4,
-        titol: "Plantada de Gegants",
-        hora: "11:15",
-        lloc: "Parc de la Devesa",
-        acta: "Trobada gegantera",
-        notes: "Arribada de furgonies a les 10:00h per descarregar."
-      }
-    ]
-  };
-
-  let selectedDateKey = "2026-09-15";
-
-  function renderCalendar() {
-    const grid = document.getElementById("calendarGrid");
-    grid.innerHTML = "";
-
-    const daysOfWeek = ["Dl", "Dt", "Dc", "Dj", "Dv", "Ds", "Dg"];
-    daysOfWeek.forEach(day => {
-      const el = document.createElement("div");
-      el.className = "day-name";
-      el.innerText = day;
-      grid.appendChild(el);
-    });
-
-    const offsetDays = 1; // Setembre 2026 comença en Dimarts
-    const totalDays = 30;
-
-    for (let i = 0; i < offsetDays; i++) {
-      const emptyCell = document.createElement("div");
-      grid.appendChild(emptyCell);
-    }
-
-    for (let day = 1; day <= totalDays; day++) {
-      const dayStr = day < 10 ? `0${day}` : `${day}`;
-      const dateKey = `2026-09-${dayStr}`;
-
-      const cell = document.createElement("div");
-      cell.className = "day-cell";
-      cell.innerText = day;
-
-      if (eventsData[dateKey]) {
-        cell.classList.add("has-event");
-      }
-
-      if (dateKey === selectedDateKey) {
-        cell.classList.add("selected");
-      }
-
-      cell.onclick = () => selectDate(dateKey);
-      grid.appendChild(cell);
-    }
-  }
-
-  function selectDate(dateKey) {
-    selectedDateKey = dateKey;
-    renderCalendar();
-    renderEvents();
-  }
-
-  function renderEvents() {
-    const listContainer = document.getElementById("eventsList");
-    const titleContainer = document.getElementById("selectedDateTitle");
-
-    const parts = selectedDateKey.split("-");
-    titleContainer.innerText = `Esdeveniments (${parts[2]}/${parts[1]}/${parts[0]})`;
-
-    listContainer.innerHTML = "";
-
-    const events = eventsData[selectedDateKey];
-
-    if (!events || events.length === 0) {
-      listContainer.innerHTML = `<div class="empty-state">No hi ha cap esdeveniment programat per a aquest dia.</div>`;
-      return;
-    }
-
-    events.forEach(event => {
-      const item = document.createElement("div");
-      item.className = "event-item";
-
-      let extraDetailsHtml = "";
-      for (const [key, value] of Object.entries(event)) {
-        if (!["id", "titol", "hora"].includes(key)) {
-          const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-          extraDetailsHtml += `
-            <div class="detail-row">
-              <span class="detail-label">${formattedKey}:</span> ${value}
-            </div>`;
-        }
-      }
-
-      item.innerHTML = `
-        <div class="event-header">
-          <span class="event-title">${event.titol}</span>
-          <span class="event-time">${event.hora} h</span>
-        </div>
-        <div class="event-details" id="details-${event.id}">
-          ${extraDetailsHtml}
-        </div>
-      `;
-
-      item.onclick = () => {
-        const detailsEl = document.getElementById(`details-${event.id}`);
-        detailsEl.classList.toggle("open");
-      };
-
-      listContainer.appendChild(item);
-    });
-  }
-
-  renderCalendar();
-  renderEvents();
-</script>
 
 </body>
 </html>
