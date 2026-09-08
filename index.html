@@ -3,15 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App Calendari i Esdeveniments</title>
+  <title>Calendari Fires 2026</title>
+  <!-- Importació de la tipografia Oswald -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --bg-color: #f4f6f8;
       --card-bg: #ffffff;
       --primary: #2c3e50;
-      --accent-yellow: #f1c40f;
-      --text-dark: #333333;
-      --text-muted: #7f8c8d;
+      --accent-yellow: #ffc600;
+      --accent-yellow-light: #fff8d6;
+      --text-dark: #222222;
+      --text-muted: #666666;
       --border-color: #e0e0e0;
     }
 
@@ -19,7 +25,6 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
@@ -28,6 +33,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     /* Contenidor amb format de pantalla de mòbil */
@@ -44,20 +50,27 @@
       position: relative;
     }
 
-    /* Capçalera */
+    /* Capçalera superior */
     header {
       background-color: var(--primary);
-      color: white;
+      color: var(--accent-yellow);
       padding: 16px;
       text-align: center;
-      font-weight: 600;
-      font-size: 1.1rem;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 3px solid var(--accent-yellow);
+      z-index: 10;
     }
 
+    /* Àrea de contingut amb desplaçament */
     .content {
       flex: 1;
       overflow-y: auto;
       padding: 16px;
+      padding-bottom: 80px; /* Espai per no tapar contingut amb el banner fix */
     }
 
     /* Targeta del calendari */
@@ -65,8 +78,9 @@
       background: var(--card-bg);
       border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       margin-bottom: 20px;
+      border-top: 4px solid var(--accent-yellow);
     }
 
     .calendar-header {
@@ -74,8 +88,11 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
-      font-weight: bold;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
       color: var(--primary);
+      text-transform: uppercase;
     }
 
     .calendar-grid {
@@ -86,23 +103,26 @@
     }
 
     .day-name {
-      font-size: 0.75rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
       color: var(--text-muted);
-      font-weight: 600;
+      font-weight: 500;
       padding-bottom: 8px;
     }
 
     .day-cell {
       aspect-ratio: 1;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 500;
       border-radius: 50%;
       cursor: pointer;
       position: relative;
       user-select: none;
+      transition: all 0.2s ease;
     }
 
     .day-cell:hover {
@@ -110,21 +130,18 @@
     }
 
     .day-cell.selected {
-      border: 2px solid var(--primary);
+      box-shadow: 0 0 0 2px var(--primary);
     }
 
-    /* Cercle groc per indicar esdeveniments */
-    .day-cell.has-event::after {
-      content: '';
-      position: absolute;
-      width: 28px;
-      height: 28px;
-      border: 2px solid var(--accent-yellow);
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
+    /* Cercle groc destacat per als dies amb esdeveniment */
+    .day-cell.has-event {
+      background-color: var(--accent-yellow);
+      color: #000000;
+      font-weight: 700;
+    }
+
+    .day-cell.has-event.selected {
+      box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--accent-yellow);
     }
 
     /* Secció d'esdeveniments del dia */
@@ -132,20 +149,23 @@
       background: var(--card-bg);
       border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .section-title {
-      font-size: 1rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.15rem;
       color: var(--primary);
       margin-bottom: 12px;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .event-item {
-      border-left: 4px solid var(--accent-yellow);
-      background-color: #fffdf0;
-      padding: 12px;
+      border-left: 5px solid var(--accent-yellow);
+      background-color: var(--accent-yellow-light);
+      padding: 12px 14px;
       border-radius: 0 8px 8px 0;
       margin-bottom: 10px;
       cursor: pointer;
@@ -153,7 +173,7 @@
     }
 
     .event-item:hover {
-      background-color: #fff9d6;
+      background-color: #ffefa3;
     }
 
     .event-header {
@@ -163,22 +183,30 @@
     }
 
     .event-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.05rem;
       font-weight: 600;
       color: var(--text-dark);
+      letter-spacing: 0.3px;
     }
 
     .event-time {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #444444;
+      background: var(--accent-yellow);
+      padding: 2px 8px;
+      border-radius: 4px;
     }
 
     /* Detalls extres de l'esdeveniment */
     .event-details {
       margin-top: 10px;
       padding-top: 10px;
-      border-top: 1px dashed var(--border-color);
+      border-top: 1px dashed #d1c170;
       display: none;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       color: var(--text-dark);
     }
 
@@ -191,7 +219,7 @@
     }
 
     .detail-label {
-      font-weight: 600;
+      font-weight: 700;
       color: var(--primary);
     }
 
@@ -201,12 +229,31 @@
       text-align: center;
       padding: 12px 0;
     }
+
+    /* Banner inferior fixat */
+    .footer-banner {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--accent-yellow);
+      color: var(--primary);
+      text-align: center;
+      padding: 14px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.15);
+      z-index: 20;
+    }
   </style>
 </head>
 <body>
 
 <div class="app-container">
-  <header>El Meu Calendari</header>
+  <header>Calendari Fires 2026</header>
   
   <div class="content">
     <!-- Targeta Calendari -->
@@ -227,53 +274,55 @@
       </div>
     </div>
   </div>
+
+  <!-- Banner fixat a la part inferior -->
+  <div class="footer-banner">
+    Fal·lera Gironina
+  </div>
 </div>
 
 <script>
-  // Dades d'exemple d'esdeveniments. 
-  // Les dades extres estan estructurades com un objecte de camps personalitzats.
   const eventsData = {
     "2026-09-10": [
       {
         id: 1,
-        titol: "Reunió de projecte",
+        titol: "Reunió d'organització",
         hora: "10:00",
-        lloc: "Oficina central / Sala B",
-        responsable: "Anna",
-        notes: "Portar la documentació impressa i la proposta de disseny."
+        lloc: "Local social",
+        responsable: "Comissió de Fires",
+        notes: "Revisió del recorregut i horaris de la cercavila."
       }
     ],
     "2026-09-15": [
       {
         id: 2,
-        titol: "Assaig general",
+        titol: "Assaig de colla",
         hora: "18:30",
-        lloc: "Local d'assaig",
-        vestuari: "Camisa blanca",
-        notes: "Comprovació del material de so abans de començar."
+        lloc: "Plaça dels Gegants",
+        vestuari: "Camisa de la colla",
+        notes: "Preparació de noves ballades per les Fires."
       },
       {
         id: 3,
-        titol: "Sopar d'equip",
+        titol: "Sopar de germanor",
         hora: "21:00",
-        lloc: "Restaurant El Racó",
-        reserva: "A nom de Jordi",
-        notes: "Confirmar assistència abans de migdia."
+        lloc: "Local social",
+        notes: "Cal confirmar assistència abans del dia 12."
       }
     ],
     "2026-09-22": [
       {
         id: 4,
-        titol: "Revisió tècnica",
+        titol: "Plantada de Gegants",
         hora: "11:15",
-        lloc: "Taller principal",
-        tecnic: "Marc",
-        notes: "Revisió de manteniment trimestral."
+        lloc: "Parc de la Devesa",
+        acta: "Trobada gegantera",
+        notes: "Arribada de furgonies a les 10:00h per descarregar."
       }
     ]
   };
 
-  let selectedDateKey = "2026-09-15"; // Data inicial seleccionada per defecte
+  let selectedDateKey = "2026-09-15";
 
   function renderCalendar() {
     const grid = document.getElementById("calendarGrid");
@@ -287,8 +336,7 @@
       grid.appendChild(el);
     });
 
-    // Configuració del mes de Setembre 2026 (Comença en dimarts = offset 1)
-    const offsetDays = 1;
+    const offsetDays = 1; // Setembre 2026 comença en Dimarts
     const totalDays = 30;
 
     for (let i = 0; i < offsetDays; i++) {
@@ -343,7 +391,6 @@
       const item = document.createElement("div");
       item.className = "event-item";
 
-      // Es generen dinàmicament tots els camps extres que contingui l'objecte
       let extraDetailsHtml = "";
       for (const [key, value] of Object.entries(event)) {
         if (!["id", "titol", "hora"].includes(key)) {
@@ -374,7 +421,6 @@
     });
   }
 
-  // Inicialització
   renderCalendar();
   renderEvents();
 </script>
