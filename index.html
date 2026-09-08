@@ -65,7 +65,6 @@
       padding-bottom: 80px;
     }
 
-    /* Targeta del calendari */
     .calendar-card {
       background: var(--card-bg);
       border-radius: 12px;
@@ -85,6 +84,18 @@
       font-weight: 600;
       color: var(--primary);
       text-transform: uppercase;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: var(--accent-yellow);
+      border: none;
+      padding: 4px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      font-weight: bold;
     }
 
     .calendar-grid {
@@ -117,13 +128,9 @@
       transition: all 0.2s ease;
     }
 
-    .day-cell:hover {
-      background-color: #f0f0f0;
-    }
+    .day-cell:hover { background-color: #f0f0f0; }
 
-    .day-cell.selected {
-      box-shadow: 0 0 0 2px var(--primary);
-    }
+    .day-cell.selected { box-shadow: 0 0 0 2px var(--primary); }
 
     .day-cell.has-event {
       background-color: var(--accent-yellow);
@@ -135,7 +142,6 @@
       box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--accent-yellow);
     }
 
-    /* Secció d'esdeveniments */
     .events-section {
       background: var(--card-bg);
       border-radius: 12px;
@@ -239,14 +245,18 @@
   <div class="content">
     <div class="calendar-card">
       <div class="calendar-header">
-        <span id="monthYearDisplay">Octubre 2026</span>
+        <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
+        <span id="monthYearDisplay">Carregant...</span>
+        <button class="nav-btn" onclick="changeMonth(1)">&gt;</button>
       </div>
       <div class="calendar-grid" id="calendarGrid"></div>
     </div>
 
     <div class="events-section">
       <div class="section-title" id="selectedDateTitle">Esdeveniments</div>
-      <div id="eventsList"></div>
+      <div id="eventsList">
+        <div class="empty-state">Carregant esdeveniments de Google Calendar...</div>
+      </div>
     </div>
   </div>
 
@@ -256,26 +266,57 @@
 </div>
 
 <script>
-  // Simulació de les dades obtingudes de la descripció de Google Calendar
-  const eventsData = {
-    "2026-10-23": [
-      {
-        titol: "INAUGURACIÓ FIRES",
-        descriptionRaw: JSON.stringify({
-          "hora_plantada": "16:00h",
-          "lloc_plantada": "Plaça Hotel Carlemany",
-          "inici_cercavila": "17:30h",
-          "recorregut": "Plaça Hotel Carlemany, Joan Maragall, Plaça Catalunya, Plaça del Vi",
-          "prego": "20:00h",
-          "balls": "21:00h"
-        })
-      }
-    ]
-  };
+  const API_KEY = "AIzaSyDu9KdgDjl34V_1vnKaBCfttsP0TD8sFQ";
+  const CALENDAR_ID = "falleragironina@gmail.com";
 
+  let currentYear = 2026;
+  let currentMonth = 9; // Octubre (0-indexed: 9 = Octubre)
   let selectedDateKey = "2026-10-23";
+  let eventsData = {};
+
+  const monthNames = [
+    "Gener", "Febrer", "Març", "Abril", "Maig", "Juny", 
+    "Juliol", "Agost", "Setembre", "Octubre", "Novembre", "Desembre"
+  ];
+
+  async function fetchGoogleCalendarEvents() {
+    const timeMin = new Date(currentYear, currentMonth, 1).toISOString();
+    const timeMax = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59).toISOString();
+
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      eventsData = {};
+
+      if (data.items) {
+        data.items.forEach(item => {
+          const start = item.start.date || item.start.dateTime;
+          if (start) {
+            const dateKey = start.split("T")[0];
+            if (!eventsData[dateKey]) eventsData[dateKey] = [];
+
+            eventsData[dateKey].push({
+              titol: item.summary || "Sense títol",
+              descriptionRaw: item.description || ""
+            });
+          }
+        });
+      }
+
+      renderCalendar();
+      renderEvents();
+    } catch (error) {
+      console.error("Error carregant esdeveniments:", error);
+      document.getElementById("eventsList").innerHTML = `<div class="empty-state">Error en carregar les dades de Google Calendar. Comprova la connexió.</div>`;
+    }
+  }
 
   function renderCalendar() {
+    document.getElementById("monthYearDisplay").innerText = `${monthNames[currentMonth]} ${currentYear}`;
+    
     const grid = document.getElementById("calendarGrid");
     grid.innerHTML = "";
 
@@ -287,9 +328,9 @@
       grid.appendChild(el);
     });
 
-    // Octubre 2026 comença en dijous (offset 3)
-    const offsetDays = 3;
-    const totalDays = 31;
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const offsetDays = (firstDay === 0 ? 6 : firstDay - 1);
+    const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
 
     for (let i = 0; i < offsetDays; i++) {
       grid.appendChild(document.createElement("div"));
@@ -297,23 +338,31 @@
 
     for (let day = 1; day <= totalDays; day++) {
       const dayStr = day < 10 ? `0${day}` : `${day}`;
-      const dateKey = `2026-10-${dayStr}`;
+      const monthStr = (currentMonth + 1) < 10 ? `0${currentMonth + 1}` : `${currentMonth + 1}`;
+      const dateKey = `${currentYear}-${monthStr}-${dayStr}`;
 
       const cell = document.createElement("div");
       cell.className = "day-cell";
       cell.innerText = day;
 
-      if (eventsData[dateKey]) {
-        cell.classList.add("has-event");
-      }
-
-      if (dateKey === selectedDateKey) {
-        cell.classList.add("selected");
-      }
+      if (eventsData[dateKey]) cell.classList.add("has-event");
+      if (dateKey === selectedDateKey) cell.classList.add("selected");
 
       cell.onclick = () => selectDate(dateKey);
       grid.appendChild(cell);
     }
+  }
+
+  function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    } else if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    fetchGoogleCalendarEvents();
   }
 
   function selectDate(dateKey) {
@@ -330,7 +379,6 @@
     titleContainer.innerText = `Esdeveniments (${parts[2]}/${parts[1]}/${parts[0]})`;
 
     listContainer.innerHTML = "";
-
     const events = eventsData[selectedDateKey];
 
     if (!events || events.length === 0) {
@@ -344,13 +392,16 @@
 
       let detailsHtml = "";
 
-      try {
-        // Intenta convertir la descripció JSON en objecte de dades
-        const fields = JSON.parse(event.descriptionRaw);
+      // Neteja d'etiquetes HTML que Google Calendar sol introduir automàticament a les descripcions
+      let cleanDescription = event.descriptionRaw
+        .replace(/<br\s*[\/]?>/gi, "")
+        .replace(/<\/?[^>]+(>|$)/g, "")
+        .trim();
 
+      try {
+        const fields = JSON.parse(cleanDescription);
         detailsHtml += `<div class="details-grid">`;
         for (const [key, value] of Object.entries(fields)) {
-          // Normalitza el nom del camp per a la visualització
           const labelFormatted = key.replace(/_/g, " ");
           detailsHtml += `
             <div class="detail-item">
@@ -359,10 +410,8 @@
             </div>`;
         }
         detailsHtml += `</div>`;
-
       } catch (e) {
-        // Si no és un JSON vàlid, mostra el text tal com està
-        detailsHtml = `<div style="margin-top:8px; font-size:0.9rem;">${event.descriptionRaw}</div>`;
+        detailsHtml = `<div style="margin-top:8px; font-size:0.9rem;">${cleanDescription || 'Sense detalls addicionals.'}</div>`;
       }
 
       card.innerHTML = `
@@ -374,8 +423,8 @@
     });
   }
 
-  renderCalendar();
-  renderEvents();
+  // Inicialització automàtica
+  fetchGoogleCalendarEvents();
 </script>
 
 </body>
