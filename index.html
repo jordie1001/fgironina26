@@ -520,15 +520,21 @@
     }
   }
 
+  // Aquesta és la funció encarregada de processar el JSON de la descripció
   function generateEventsListHtml(events) {
     let html = "";
     events.forEach(ev => {
-      // Neteja d'espais especials (&nbsp;, \xa0), etiquetes HTML i salts de línia
+      // 1. Convertim etiquetes HTML de salt de línia en espais
       let cleanDescription = ev.descriptionRaw
+        .replace(/<br\s*[\/]?>/gi, "\n")
+        .replace(/<\/p><p>/gi, "\n")
+        .replace(/<\/?[^>]+(>|$)/g, "");
+
+      // 2. Traiem espais d'amplada zero i espais no-trencables que afegeix Google
+      cleanDescription = cleanDescription
         .replace(/&nbsp;/g, " ")
         .replace(/\u00a0/g, " ")
-        .replace(/<br\s*[\/]?>/gi, " ")
-        .replace(/<\/?[^>]+(>|$)/g, "")
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
         .trim();
 
       let detailsFormatted = "";
