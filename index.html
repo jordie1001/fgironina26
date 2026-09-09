@@ -515,31 +515,43 @@
     events.forEach(ev => {
       let raw = ev.descriptionRaw;
 
-      // 1. Neteja d'etiquetes HTML
+      // 1. Convertim salts de línia d'HTML a textos plans
       raw = raw.replace(/<\/p>/gi, "\n").replace(/<br\s*[\/]?>/gi, "\n");
       let cleanText = raw.replace(/<\/?[^>]+(>|$)/g, "");
 
-      // 2. Normalització de cometes i espais
+      // 2. Neteja de caràcters especials
       cleanText = cleanText
+        .replace(/&quot;/g, '"')
         .replace(/&nbsp;/g, " ")
         .replace(/\u00a0/g, " ")
         .replace(/[\u200B-\u200D\uFEFF]/g, "")
-        .replace(/”|“|„|¨/g, '"')
         .trim();
 
-      let detailsHtml = "";
-
-      // 3. Extracció directa per Regex de parelles "clau": "valor"
-      const regex = /"([^"]+)":\s*"([^"]+)"/g;
-      let match;
       let pairs = [];
 
-      while ((match = regex.exec(cleanText)) !== null) {
-        pairs.push({
-          key: match[1].replace(/_/g, " "),
-          value: match[2]
-        });
-      }
+      // 3. Processament universal: suporta tant JSON antic com format directament per línies
+      const lines = cleanText.split('\n');
+      lines.forEach(line => {
+        // Neteja caràcters de JSON com cometes o claus inicials/finals
+        let cleanLine = line.replace(/[{}\"]/g, '').trim();
+        
+        // Traiem la coma final si existia
+        if (cleanLine.endsWith(',')) {
+          cleanLine = cleanLine.slice(0, -1).trim();
+        }
+
+        const colonIdx = cleanLine.indexOf(':');
+        if (colonIdx !== -1) {
+          const key = cleanLine.substring(0, colonIdx).trim().replace(/_/g, " ");
+          const value = cleanLine.substring(colonIdx + 1).trim();
+
+          if (key && value) {
+            pairs.push({ key, value });
+          }
+        }
+      });
+
+      let detailsHtml = "";
 
       if (pairs.length > 0) {
         detailsHtml = `<div class="event-details-grid">`;
