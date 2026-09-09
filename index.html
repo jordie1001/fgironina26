@@ -42,7 +42,6 @@
       position: relative;
     }
 
-    /* Header superior */
     .top-header {
       background: var(--card-bg);
       display: flex;
@@ -76,7 +75,6 @@
       padding: 0 8px;
     }
 
-    /* Selector de vista */
     .view-selector-bar {
       display: flex;
       background: var(--card-bg);
@@ -101,14 +99,12 @@
       border-bottom-color: var(--primary-ocre);
     }
 
-    /* Àrea de contingut */
     .content-area {
       flex: 1;
       overflow-y: auto;
       padding-bottom: 90px;
     }
 
-    /* Vista Calendari */
     .calendar-card {
       background: var(--card-bg);
       margin: 16px;
@@ -163,7 +159,6 @@
       padding: 0 16px;
     }
 
-    /* Vista Llista (Timeline) */
     .day-row {
       display: flex;
       padding: 12px 20px 0 20px;
@@ -252,7 +247,6 @@
       font-size: 0.9rem;
     }
 
-    /* Banner inferior fixat */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -307,7 +301,7 @@
   const CALENDAR_ID = "fd6ecb65a2fb197af285eaca224d7b71400dc26aeafe16fd77aa3f97086b466a@group.calendar.google.com";
 
   let currentYear = 2026;
-  let currentMonth = 9; // Octubre (0-indexed: 9 = Octubre)
+  let currentMonth = 9; // 9 = Octubre (0-indexed)
   let activeView = "calendar";
   let selectedDateKey = null;
   let eventsData = {};
@@ -318,13 +312,22 @@
   ];
   const daysNames = ["DIU", "DILL", "DIM", "DMC", "DIJ", "DIV", "DISS"];
 
+  // Funció helper per formatar una data a YYYY-MM-DD segons la zona horària local (Europe/Madrid)
+  function getLocalDateKey(dateObj) {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   async function fetchCalendarEvents() {
     document.getElementById("mainContent").innerHTML = `<div class="empty-state">Carregant esdeveniments...</div>`;
     
-    const timeMin = new Date(currentYear, currentMonth, 1).toISOString();
-    const timeMax = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59).toISOString();
+    // Fem la consulta amb un marge d'un dia abans i un dia després per evitar problemes de TimeZone
+    const timeMin = new Date(currentYear, currentMonth, 1, 0, 0, 0).toISOString();
+    const timeMax = new Date(currentYear, currentMonth + 1, 1, 23, 59, 59).toISOString();
 
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime&timeZone=Europe/Madrid`;
 
     try {
       const response = await fetch(url);
@@ -334,9 +337,18 @@
 
       if (data.items) {
         data.items.forEach(item => {
-          const start = item.start.date || item.start.dateTime;
-          if (start) {
-            const dateKey = start.split("T")[0];
+          let dateKey = "";
+
+          if (item.start.date) {
+            // Esdeveniment de tot el dia (YYYY-MM-DD)
+            dateKey = item.start.date;
+          } else if (item.start.dateTime) {
+            // Esdeveniment amb hora específica: Convertim a la data local
+            const d = new Date(item.start.dateTime);
+            dateKey = getLocalDateKey(d);
+          }
+
+          if (dateKey) {
             if (!eventsData[dateKey]) eventsData[dateKey] = [];
 
             eventsData[dateKey].push({
@@ -416,8 +428,8 @@
     }
 
     for (let day = 1; day <= totalDays; day++) {
-      const dayStr = day < 10 ? `0${day}` : `${day}`;
-      const monthStr = (currentMonth + 1) < 10 ? `0${currentMonth + 1}` : `${currentMonth + 1}`;
+      const dayStr = String(day).padStart(2, '0');
+      const monthStr = String(currentMonth + 1).padStart(2, '0');
       const dateKey = `${currentYear}-${monthStr}-${dayStr}`;
 
       const cell = document.createElement("div");
@@ -453,8 +465,8 @@
     let hasAnyEventsInMonth = false;
 
     for (let day = 1; day <= totalDays; day++) {
-      const dayStr = day < 10 ? `0${day}` : `${day}`;
-      const monthStr = (currentMonth + 1) < 10 ? `0${currentMonth + 1}` : `${currentMonth + 1}`;
+      const dayStr = String(day).padStart(2, '0');
+      const monthStr = String(currentMonth + 1).padStart(2, '0');
       const dateKey = `${currentYear}-${monthStr}-${dayStr}`;
 
       const dayEvents = eventsData[dateKey];
@@ -520,7 +532,6 @@
     return html;
   }
 
-  // Càrrega inicial
   fetchCalendarEvents();
 </script>
 
