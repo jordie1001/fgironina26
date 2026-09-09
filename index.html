@@ -13,7 +13,6 @@
       --bg-app: #f7f9fb;
       --card-bg: #ffffff;
       --primary-ocre: #ffc600;
-      --ocre-light: #fff9db;
       --text-dark: #2c3e50;
       --text-muted: #8e9aa8;
       --border-color: #eef2f5;
@@ -49,68 +48,133 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 20px;
+      padding: 14px 16px;
       border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .nav-title {
-      font-size: 1.1rem;
-      font-weight: 500;
+      font-size: 1.05rem;
+      font-weight: 700;
       color: var(--text-dark);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
     }
 
-    .icon-btn {
+    .nav-btn {
       background: none;
       border: none;
-      font-size: 1.2rem;
-      color: var(--text-muted);
+      font-size: 1rem;
+      color: var(--text-dark);
       cursor: pointer;
+      font-weight: bold;
+      padding: 0 4px;
     }
 
-    /* Sub-header amb columnes DATE / EVENTS */
-    .sub-header {
+    /* Sub-header amb selector de vista */
+    .view-selector-bar {
       display: flex;
       background: var(--card-bg);
-      padding: 12px 20px;
       border-bottom: 1px solid var(--border-color);
+    }
+
+    .view-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
       font-size: 0.75rem;
       font-weight: 700;
       color: var(--text-muted);
       letter-spacing: 0.8px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      text-transform: uppercase;
     }
 
-    .col-date-title { width: 60px; }
-    .col-events-title { flex: 1; display: flex; justify-content: space-between; align-items: center; }
+    .view-tab.active {
+      color: var(--text-dark);
+      border-bottom-color: var(--primary-ocre);
+    }
 
-    /* Llista d'agenda amb línia temporal */
-    .content-timeline {
+    /* Àrea de contingut general */
+    .content-area {
       flex: 1;
       overflow-y: auto;
-      padding: 10px 0 100px 0;
+      padding-bottom: 90px;
     }
 
+    /* === VISTA CALENDARI (GRAELLA) === */
+    .calendar-card {
+      background: var(--card-bg);
+      margin: 16px;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border-top: 4px solid var(--primary-ocre);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .grid-day-name {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding-bottom: 8px;
+    }
+
+    .grid-day-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: 50%;
+      color: var(--text-muted);
+      pointer-events: none; /* Per defecte deshabilitats */
+      opacity: 0.4;
+    }
+
+    /* Dies actius (amb esdeveniment) */
+    .grid-day-cell.has-event {
+      background-color: var(--primary-ocre);
+      color: var(--text-dark);
+      font-weight: 700;
+      cursor: pointer;
+      pointer-events: auto; /* Es poden clicar */
+      opacity: 1;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .selected-events-container {
+      padding: 0 16px;
+    }
+
+    /* === VISTA LLISTA (TIMELINE) === */
     .day-row {
       display: flex;
-      padding: 0 20px;
+      padding: 12px 20px 0 20px;
       position: relative;
     }
 
-    /* Columna de Data i Línia Vertical */
     .date-col {
       width: 60px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       position: relative;
-      padding-top: 6px;
     }
 
     .day-num {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 700;
       color: var(--text-dark);
       line-height: 1;
@@ -124,22 +188,15 @@
       margin-top: 2px;
     }
 
-    /* Línia temporal amb cercle */
     .timeline-indicator {
       position: absolute;
       right: 12px;
-      top: 12px;
+      top: 6px;
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      border: 2px solid var(--text-muted);
-      background: var(--bg-app);
-      z-index: 2;
-    }
-
-    .day-row.has-events .timeline-indicator {
-      border-color: var(--primary-ocre);
       background: var(--primary-ocre);
+      z-index: 2;
     }
 
     .timeline-line {
@@ -152,18 +209,16 @@
       z-index: 1;
     }
 
-    /* Columna d'esdeveniments i targetes */
     .events-col {
       flex: 1;
       padding-left: 15px;
-      padding-bottom: 20px;
     }
 
     .event-card {
       background: var(--card-bg);
       border-radius: 8px;
       padding: 12px 14px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
       border-left: 4px solid var(--primary-ocre);
     }
@@ -176,14 +231,13 @@
 
     .event-title {
       font-size: 0.95rem;
-      font-weight: 500;
+      font-weight: 700;
       color: var(--text-dark);
     }
 
     .event-time {
       font-size: 0.75rem;
       color: var(--text-muted);
-      font-weight: 400;
     }
 
     .event-details {
@@ -194,16 +248,17 @@
       color: #555;
     }
 
-    .detail-row {
-      margin-bottom: 3px;
+    .detail-row { margin-bottom: 3px; }
+    .detail-key { font-weight: 600; color: var(--text-dark); text-transform: capitalize; }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
     }
 
-    .detail-key {
-      font-weight: 500;
-      color: var(--text-dark);
-    }
-
-    /* Barra inferior estil app */
+    /* Barra inferior fixada */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -220,90 +275,47 @@
       background-color: var(--primary-ocre);
       color: var(--text-dark);
       text-align: center;
-      padding: 6px;
+      padding: 8px;
       font-size: 0.85rem;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-    }
-
-    .nav-icons {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 10px 0;
-      position: relative;
-    }
-
-    .nav-item {
-      color: var(--text-muted);
-      font-size: 1.1rem;
-      cursor: pointer;
-    }
-
-    .nav-item.active {
-      color: var(--text-dark);
-    }
-
-    .fab-btn {
-      width: 44px;
-      height: 44px;
-      background-color: var(--primary-ocre);
-      color: var(--text-dark);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.4rem;
-      font-weight: 300;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      margin-top: -22px;
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
 <div class="app-container">
-  <!-- Capçalera -->
+  <!-- Capçalera amb canvi de mes -->
   <div class="top-header">
-    <button class="icon-btn">☰</button>
-    <div class="nav-title" id="monthDisplay">Octubre 2026 ▾</div>
-    <button class="icon-btn">⋮</button>
-  </div>
-
-  <!-- Capçalera de taula -->
-  <div class="sub-header">
-    <div class="col-date-title">DATA</div>
-    <div class="col-events-title">
-      <span>ESDEVENIMENTS</span>
-      <span style="font-size: 0.9rem; cursor: pointer;">⛶</span>
+    <div class="nav-controls">
+      <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
+      <div class="nav-title" id="monthDisplay">Octubre 2026</div>
+      <button class="nav-btn" onclick="changeMonth(1)">&gt;</button>
     </div>
   </div>
 
-  <!-- Llista de Dies i Esdeveniments (Timeline) -->
-  <div class="content-timeline" id="timelineContent"></div>
+  <!-- Selector de Vista -->
+  <div class="view-selector-bar">
+    <div class="view-tab active" id="tabCalendar" onclick="switchView('calendar')">Vista Calendari</div>
+    <div class="view-tab" id="tabList" onclick="switchView('list')">Vista Llista</div>
+  </div>
 
-  <!-- Barra de navegació inferior fixada -->
+  <!-- Àrea de Contingut Dibuixat Dinàmicament -->
+  <div class="content-area" id="mainContent"></div>
+
+  <!-- Banner inferior fixat -->
   <div class="bottom-bar">
     <div class="banner-text">Fal·lera Gironina</div>
-    <div class="nav-icons">
-      <div class="nav-item">🔖</div>
-      <div class="nav-item active">📅</div>
-      <div class="fab-btn">+</div>
-      <div class="nav-item">🔲</div>
-      <div class="nav-item">♡</div>
-    </div>
   </div>
 </div>
 
 <script>
-  // Dades d'exemple que en el pas següent vindran directament de Google Apps Script
+  // Dades d'exemple d'esdeveniments
   const eventsData = {
     "2026-10-23": [
       {
         titol: "INAUGURACIÓ FIRES",
-        hora: "16:00 - 21:00",
         descriptionRaw: JSON.stringify({
           "hora_plantada": "16:00h",
           "lloc_plantada": "Plaça Hotel Carlemany",
@@ -317,77 +329,190 @@
     "2026-10-24": [
       {
         titol: "Cercavila de Matinades",
-        hora: "08:00",
         descriptionRaw: "Matinades pels carrers del barri vell."
       }
     ]
   };
 
+  let currentYear = 2026;
+  let currentMonth = 9; // Octubre (0-indexed: 9 = Octubre)
+  let activeView = "calendar"; // 'calendar' o 'list'
+  let selectedDateKey = null;
+
+  const monthNames = [
+    "Gener", "Febrer", "Març", "Abril", "Maig", "Juny", 
+    "Juliol", "Agost", "Setembre", "Octubre", "Novembre", "Desembre"
+  ];
   const daysNames = ["DIU", "DILL", "DIM", "DMC", "DIJ", "DIV", "DISS"];
 
-  function renderTimeline() {
-    const container = document.getElementById("timelineContent");
+  function updateHeader() {
+    document.getElementById("monthDisplay").innerText = `${monthNames[currentMonth]} ${currentYear}`;
+  }
+
+  function switchView(view) {
+    activeView = view;
+    document.getElementById("tabCalendar").classList.toggle("active", view === "calendar");
+    document.getElementById("tabList").classList.toggle("active", view === "list");
+    selectedDateKey = null; // Reinicia selecció de dia en canviar de vista
+    renderView();
+  }
+
+  function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    } else if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    selectedDateKey = null;
+    updateHeader();
+    renderView();
+  }
+
+  function renderView() {
+    updateHeader();
+    const container = document.getElementById("mainContent");
     container.innerHTML = "";
 
-    // Generar els dies del mes d'Octubre 2026
-    const totalDays = 31;
-
-    for (let day = 1; day <= totalDays; day++) {
-      const dayStr = day < 10 ? `0${day}` : `${day}`;
-      const dateKey = `2026-10-${dayStr}`;
-      const dateObj = new Date(2026, 9, day);
-      const dayName = daysNames[dateObj.getDay()];
-
-      const dayEvents = eventsData[dateKey] || [];
-      const hasEvents = dayEvents.length > 0;
-
-      const row = document.createElement("div");
-      row.className = `day-row ${hasEvents ? 'has-events' : ''}`;
-
-      let eventsHtml = "";
-      if (hasEvents) {
-        dayEvents.forEach(ev => {
-          let detailsFormatted = "";
-          try {
-            const fields = JSON.parse(ev.descriptionRaw);
-            detailsFormatted = `<div class="event-details">`;
-            for (const [k, v] of Object.entries(fields)) {
-              detailsFormatted += `<div class="detail-row"><span class="detail-key">${k.replace(/_/g, " ")}:</span> ${v}</div>`;
-            }
-            detailsFormatted += `</div>`;
-          } catch(e) {
-            detailsFormatted = `<div class="event-details">${ev.descriptionRaw}</div>`;
-          }
-
-          eventsHtml += `
-            <div class="event-card">
-              <div class="event-header">
-                <span class="event-title">${ev.titol}</span>
-                <span class="event-time">${ev.hora || ''}</span>
-              </div>
-              ${detailsFormatted}
-            </div>
-          `;
-        });
-      }
-
-      row.innerHTML = `
-        <div class="date-col">
-          <div class="day-num">${dayStr}</div>
-          <div class="day-name">${dayName}</div>
-          <div class="timeline-indicator"></div>
-          <div class="timeline-line"></div>
-        </div>
-        <div class="events-col">
-          ${eventsHtml}
-        </div>
-      `;
-
-      container.appendChild(row);
+    if (activeView === "calendar") {
+      renderCalendarView(container);
+    } else {
+      renderListView(container);
     }
   }
 
-  renderTimeline();
+  /* RENDERITZACIÓ DE LA VISTA CALENDARI */
+  function renderCalendarView(container) {
+    const card = document.createElement("div");
+    card.className = "calendar-card";
+
+    const grid = document.createElement("div");
+    grid.className = "calendar-grid";
+
+    // Dies de la setmana
+    const weekDays = ["Dl", "Dt", "Dc", "Dj", "Dv", "Ds", "Dg"];
+    weekDays.forEach(d => {
+      const el = document.createElement("div");
+      el.className = "grid-day-name";
+      el.innerText = d;
+      grid.appendChild(el);
+    });
+
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const offsetDays = (firstDay === 0 ? 6 : firstDay - 1);
+    const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    for (let i = 0; i < offsetDays; i++) {
+      grid.appendChild(document.createElement("div"));
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+      const dayStr = day < 10 ? `0${day}` : `${day}`;
+      const monthStr = (currentMonth + 1) < 10 ? `0${currentMonth + 1}` : `${currentMonth + 1}`;
+      const dateKey = `${currentYear}-${monthStr}-${dayStr}`;
+
+      const cell = document.createElement("div");
+      cell.className = "grid-day-cell";
+      cell.innerText = day;
+
+      // Només si té esdeveniments es pot seleccionar
+      if (eventsData[dateKey] && eventsData[dateKey].length > 0) {
+        cell.classList.add("has-event");
+        cell.onclick = () => {
+          selectedDateKey = dateKey;
+          renderView();
+        };
+      }
+
+      grid.appendChild(cell);
+    }
+
+    card.appendChild(grid);
+    container.appendChild(card);
+
+    // Si hi ha un dia seleccionat, mostra els esdeveniments a sota
+    if (selectedDateKey && eventsData[selectedDateKey]) {
+      const eventsContainer = document.createElement("div");
+      eventsContainer.className = "selected-events-container";
+      eventsContainer.innerHTML = generateEventsListHtml(selectedDateKey, eventsData[selectedDateKey]);
+      container.appendChild(eventsContainer);
+    }
+  }
+
+  /* RENDERITZACIÓ DE LA VISTA LLISTA (NOMÉS DIES AMB ESDEVENIMENTS) */
+  function renderListView(container) {
+    const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+    let hasAnyEventsInMonth = false;
+
+    for (let day = 1; day <= totalDays; day++) {
+      const dayStr = day < 10 ? `0${day}` : `${day}`;
+      const monthStr = (currentMonth + 1) < 10 ? `0${currentMonth + 1}` : `${currentMonth + 1}`;
+      const dateKey = `${currentYear}-${monthStr}-${dayStr}`;
+
+      const dayEvents = eventsData[dateKey];
+
+      // Oculta els dies sense esdeveniments
+      if (dayEvents && dayEvents.length > 0) {
+        hasAnyEventsInMonth = true;
+        const dateObj = new Date(currentYear, currentMonth, day);
+        const dayName = daysNames[dateObj.getDay()];
+
+        const row = document.createElement("div");
+        row.className = "day-row";
+
+        row.innerHTML = `
+          <div class="date-col">
+            <div class="day-num">${dayStr}</div>
+            <div class="day-name">${dayName}</div>
+            <div class="timeline-indicator"></div>
+            <div class="timeline-line"></div>
+          </div>
+          <div class="events-col">
+            ${generateEventsListHtml(dateKey, dayEvents)}
+          </div>
+        `;
+
+        container.appendChild(row);
+      }
+    }
+
+    if (!hasAnyEventsInMonth) {
+      container.innerHTML = `<div class="empty-state">No hi ha cap esdeveniment programat per a aquest mes.</div>`;
+    }
+  }
+
+  /* GENERADOR DE TARGETES D'ESDEVENIMENT */
+  function generateEventsListHtml(dateKey, events) {
+    let html = "";
+    events.forEach(ev => {
+      let detailsFormatted = "";
+      try {
+        const fields = JSON.parse(ev.descriptionRaw);
+        detailsFormatted = `<div class="event-details">`;
+        for (const [k, v] of Object.entries(fields)) {
+          detailsFormatted += `<div class="detail-row"><span class="detail-key">${k.replace(/_/g, " ")}:</span> ${v}</div>`;
+        }
+        detailsFormatted += `</div>`;
+      } catch(e) {
+        detailsFormatted = `<div class="event-details">${ev.descriptionRaw}</div>`;
+      }
+
+      html += `
+        <div class="event-card">
+          <div class="event-header">
+            <span class="event-title">${ev.titol}</span>
+          </div>
+          ${detailsFormatted}
+        </div>
+      `;
+    });
+    return html;
+  }
+
+  // Inicialització
+  renderView();
 </script>
 
 </body>
