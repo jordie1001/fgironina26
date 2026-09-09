@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendari Fires 2026</title>
+  <title>Calendari Fires</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -301,7 +301,7 @@
   const CALENDAR_ID = "fd6ecb65a2fb197af285eaca224d7b71400dc26aeafe16fd77aa3f97086b466a@group.calendar.google.com";
 
   let currentYear = 2026;
-  let currentMonth = 9; // 9 = Octubre (0-indexed)
+  let currentMonth = 9; // 9 = Octubre (mesos de 0 a 11)
   let activeView = "calendar";
   let selectedDateKey = null;
   let eventsData = {};
@@ -312,47 +312,44 @@
   ];
   const daysNames = ["DIU", "DILL", "DIM", "DMC", "DIJ", "DIV", "DISS"];
 
-  // Funció helper per formatar una data a YYYY-MM-DD segons la zona horària local (Europe/Madrid)
-  function getLocalDateKey(dateObj) {
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
   async function fetchCalendarEvents() {
     document.getElementById("mainContent").innerHTML = `<div class="empty-state">Carregant esdeveniments...</div>`;
     
-    // Fem la consulta amb un marge d'un dia abans i un dia després per evitar problemes de TimeZone
-    const timeMin = new Date(currentYear, currentMonth, 1, 0, 0, 0).toISOString();
-    const timeMax = new Date(currentYear, currentMonth + 1, 1, 23, 59, 59).toISOString();
+    // Generem l'inici i final del mes de manera amplia
+    const startDate = new Date(currentYear, currentMonth, 1, 0, 0, 0);
+    const endDate = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59);
 
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime&timeZone=Europe/Madrid`;
+    const timeMin = startDate.toISOString();
+    const timeMax = endDate.toISOString();
+
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
 
     try {
       const response = await fetch(url);
       const data = await response.json();
 
+      if (data.error) {
+        document.getElementById("mainContent").innerHTML = `<div class="empty-state" style="color:red">Error API Google: ${data.error.message}</div>`;
+        return;
+      }
+
       eventsData = {};
 
-      if (data.items) {
+      if (data.items && data.items.length > 0) {
         data.items.forEach(item => {
-          let dateKey = "";
+          let rawDate = "";
 
           if (item.start.date) {
-            // Esdeveniment de tot el dia (YYYY-MM-DD)
-            dateKey = item.start.date;
+            rawDate = item.start.date;
           } else if (item.start.dateTime) {
-            // Esdeveniment amb hora específica: Convertim a la data local
-            const d = new Date(item.start.dateTime);
-            dateKey = getLocalDateKey(d);
+            rawDate = item.start.dateTime.split("T")[0];
           }
 
-          if (dateKey) {
-            if (!eventsData[dateKey]) eventsData[dateKey] = [];
+          if (rawDate) {
+            if (!eventsData[rawDate]) eventsData[rawDate] = [];
 
-            eventsData[dateKey].push({
-              titol: item.summary || "Sense títol",
+            eventsData[rawDate].push({
+              titol: item.summary || "Esdeveniment",
               descriptionRaw: item.description || ""
             });
           }
@@ -361,8 +358,8 @@
 
       renderView();
     } catch (error) {
-      console.error("Error carregant esdeveniments:", error);
-      document.getElementById("mainContent").innerHTML = `<div class="empty-state">Error en carregar les dades de Google Calendar.</div>`;
+      console.error("Error direct de xarxa:", error);
+      document.getElementById("mainContent").innerHTML = `<div class="empty-state">No s'ha pogut connectar amb Google Calendar.</div>`;
     }
   }
 
@@ -496,7 +493,7 @@
     }
 
     if (!hasAnyEventsInMonth) {
-      container.innerHTML = `<div class="empty-state">No hi ha cap esdeveniment programat per a aquest mes.</div>`;
+      container.innerHTML = `<div class="empty-state">No hi ha cap esdeveniment trobat per a aquest mes.</div>`;
     }
   }
 
@@ -532,6 +529,7 @@
     return html;
   }
 
+  // Carregada inicial
   fetchCalendarEvents();
 </script>
 
