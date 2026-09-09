@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendari Fires 2026</title>
+  <title>Calendari Fires</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -230,15 +230,37 @@
     }
 
     .event-details {
-      margin-top: 8px;
+      margin-top: 10px;
       padding-top: 8px;
       border-top: 1px dashed var(--border-color);
-      font-size: 0.8rem;
-      color: #555;
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .detail-row { margin-bottom: 3px; }
-    .detail-key { font-weight: 600; color: var(--text-dark); text-transform: capitalize; }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .detail-key {
+      font-weight: 700;
+      color: var(--text-dark);
+      text-transform: capitalize;
+      font-size: 0.8rem;
+      opacity: 0.85;
+      flex-shrink: 0;
+    }
+
+    .detail-value {
+      color: #4a5568;
+      text-align: right;
+      font-weight: 400;
+      word-break: break-word;
+    }
 
     .empty-state {
       text-align: center;
@@ -300,8 +322,10 @@
   const API_KEY = "AIzaSyAgw7NMentR5EuYyyu9wnGnNJyMz5HPpEs";
   const CALENDAR_ID = "fd6ecb65a2fb197af285eaca224d7b71400dc26aeafe16fd77aa3f97086b466a@group.calendar.google.com";
 
-  let currentYear = 2026;
-  let currentMonth = 9; // 9 = Octubre (0-indexed)
+  const today = new Date();
+  let currentYear = today.getFullYear();
+  let currentMonth = today.getMonth();
+
   let activeView = "calendar";
   let selectedDateKey = null;
   let eventsData = {};
@@ -499,21 +523,33 @@
   function generateEventsListHtml(events) {
     let html = "";
     events.forEach(ev => {
+      // Neteja d'espais especials (&nbsp;, \xa0), etiquetes HTML i salts de línia
       let cleanDescription = ev.descriptionRaw
-        .replace(/<br\s*[\/]?>/gi, "")
+        .replace(/&nbsp;/g, " ")
+        .replace(/\u00a0/g, " ")
+        .replace(/<br\s*[\/]?>/gi, " ")
         .replace(/<\/?[^>]+(>|$)/g, "")
         .trim();
 
       let detailsFormatted = "";
-      try {
-        const fields = JSON.parse(cleanDescription);
-        detailsFormatted = `<div class="event-details">`;
-        for (const [k, v] of Object.entries(fields)) {
-          detailsFormatted += `<div class="detail-row"><span class="detail-key">${k.replace(/_/g, " ")}:</span> ${v}</div>`;
+
+      if (cleanDescription) {
+        try {
+          const fields = JSON.parse(cleanDescription);
+          
+          detailsFormatted = `<div class="event-details">`;
+          for (const [k, v] of Object.entries(fields)) {
+            const formattedKey = k.replace(/_/g, " ");
+            detailsFormatted += `
+              <div class="detail-row">
+                <span class="detail-key">${formattedKey}:</span> 
+                <span class="detail-value">${v}</span>
+              </div>`;
+          }
+          detailsFormatted += `</div>`;
+        } catch(e) {
+          detailsFormatted = `<div class="event-details"><div class="detail-value">${cleanDescription}</div></div>`;
         }
-        detailsFormatted += `</div>`;
-      } catch(e) {
-        detailsFormatted = cleanDescription ? `<div class="event-details">${cleanDescription}</div>` : "";
       }
 
       html += `
