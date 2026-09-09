@@ -6,7 +6,7 @@
   <title>Calendari Fires</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -28,7 +28,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Montserrat', sans-serif;
     }
 
     .app-container {
@@ -82,6 +82,7 @@
       align-items: center;
       justify-content: center;
       transition: background 0.2s;
+      font-family: 'Montserrat', sans-serif;
     }
 
     .nav-btn:active {
@@ -190,7 +191,6 @@
       margin-bottom: 6px;
     }
 
-    /* Disseny de detalls amb fons groc net */
     .event-details-grid {
       margin-top: 12px;
       display: flex;
@@ -205,25 +205,24 @@
       padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
     }
 
     .detail-label {
       font-size: 0.7rem;
-      font-weight: 900;
+      font-weight: 800;
       text-transform: uppercase;
       color: #854d0e;
       letter-spacing: 0.5px;
     }
 
     .detail-value {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       color: #1e293b;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
-    /* Vista Llista */
     .day-row {
       display: flex;
       padding: 14px 16px 0 16px;
@@ -261,7 +260,7 @@
       padding: 40px 20px;
       color: var(--text-muted);
       font-size: 0.95rem;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .bottom-bar {
@@ -510,69 +509,56 @@
     }
   }
 
-  // Funció de neteja profunda i parsejat JSON millorat
   function generateEventsListHtml(events) {
     let html = "";
 
     events.forEach(ev => {
       let raw = ev.descriptionRaw;
 
-      // 1. Convertim blocs d'etiquetes en salts de línia
+      // 1. Neteja d'etiquetes HTML
       raw = raw.replace(/<\/p>/gi, "\n").replace(/<br\s*[\/]?>/gi, "\n");
-
-      // 2. Netegem TOTES les etiquetes HTML i entitats especials
       let cleanText = raw.replace(/<\/?[^>]+(>|$)/g, "");
-      
-      // 3. Substituïm espais d'amplada zero, &nbsp;, \xa0 i cometes tipogràfiques
+
+      // 2. Normalització de cometes i espais
       cleanText = cleanText
         .replace(/&nbsp;/g, " ")
         .replace(/\u00a0/g, " ")
         .replace(/[\u200B-\u200D\uFEFF]/g, "")
-        .replace(/”|“/g, '"')
+        .replace(/”|“|„|¨/g, '"')
         .trim();
 
       let detailsHtml = "";
 
-      if (cleanText) {
-        // Intentem extreure un JSON validant la posició de les claus { }
-        const firstBrace = cleanText.indexOf('{');
-        const lastBrace = cleanText.lastIndexOf('}');
+      // 3. Extracció directa per Regex de parelles "clau": "valor"
+      const regex = /"([^"]+)":\s*"([^"]+)"/g;
+      let match;
+      let pairs = [];
 
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          const jsonSubstring = cleanText.substring(firstBrace, lastBrace + 1);
+      while ((match = regex.exec(cleanText)) !== null) {
+        pairs.push({
+          key: match[1].replace(/_/g, " "),
+          value: match[2]
+        });
+      }
 
-          try {
-            const parsedData = JSON.parse(jsonSubstring);
-            
-            detailsHtml = `<div class="event-details-grid">`;
-            for (const [key, val] of Object.entries(parsedData)) {
-              const label = key.replace(/_/g, " ");
-              detailsHtml += `
-                <div class="detail-box">
-                  <span class="detail-label">${label}</span>
-                  <span class="detail-value">${val}</span>
-                </div>
-              `;
-            }
-            detailsHtml += `</div>`;
-          } catch (e) {
-            // S'executa si falla la conversió a JSON
-            detailsHtml = `
-              <div class="event-details-grid">
-                <div class="detail-box">
-                  <span class="detail-value">${cleanText}</span>
-                </div>
-              </div>`;
-          }
-        } else {
-          // Si no té format JSON (text normal)
-          detailsHtml = `
-            <div class="event-details-grid">
-              <div class="detail-box">
-                <span class="detail-value">${cleanText}</span>
-              </div>
-            </div>`;
-        }
+      if (pairs.length > 0) {
+        detailsHtml = `<div class="event-details-grid">`;
+        pairs.forEach(p => {
+          detailsHtml += `
+            <div class="detail-box">
+              <span class="detail-label">${p.key}</span>
+              <span class="detail-value">${p.value}</span>
+            </div>
+          `;
+        });
+        detailsHtml += `</div>`;
+      } else if (cleanText) {
+        detailsHtml = `
+          <div class="event-details-grid">
+            <div class="detail-box">
+              <span class="detail-value">${cleanText}</span>
+            </div>
+          </div>`;
       }
 
       html += `
