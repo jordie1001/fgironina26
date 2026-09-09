@@ -6,22 +6,24 @@
   <title>Calendari Fires</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-app: #f7f9fb;
+      --bg-app: #f4f6f9;
       --card-bg: #ffffff;
-      --primary-ocre: #ffc600;
-      --text-dark: #2c3e50;
-      --text-muted: #8e9aa8;
-      --border-color: #eef2f5;
+      --primary-yellow: #ffc600;
+      --yellow-light: #fff9e6;
+      --yellow-border: #ffe066;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background-color: #1a1a1a;
+      background-color: #0f172a;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -37,7 +39,7 @@
       background-color: var(--bg-app);
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 30px rgba(0,0,0,0.4);
       overflow: hidden;
       position: relative;
     }
@@ -47,7 +49,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 14px 16px;
+      padding: 16px;
       border-bottom: 1px solid var(--border-color);
     }
 
@@ -60,19 +62,30 @@
     }
 
     .nav-title {
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: 1.1rem;
+      font-weight: 800;
       color: var(--text-dark);
+      letter-spacing: -0.2px;
     }
 
     .nav-btn {
-      background: none;
+      background: #f1f5f9;
       border: none;
-      font-size: 1.2rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.1rem;
       color: var(--text-dark);
       cursor: pointer;
       font-weight: bold;
-      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .nav-btn:active {
+      background: var(--primary-yellow);
     }
 
     .view-selector-bar {
@@ -84,34 +97,34 @@
     .view-tab {
       flex: 1;
       text-align: center;
-      padding: 10px 0;
-      font-size: 0.75rem;
-      font-weight: 700;
+      padding: 12px 0;
+      font-size: 0.8rem;
+      font-weight: 800;
       color: var(--text-muted);
-      letter-spacing: 0.8px;
+      letter-spacing: 0.5px;
       cursor: pointer;
-      border-bottom: 2px solid transparent;
+      border-bottom: 3px solid transparent;
       text-transform: uppercase;
     }
 
     .view-tab.active {
       color: var(--text-dark);
-      border-bottom-color: var(--primary-ocre);
+      border-bottom-color: var(--primary-yellow);
     }
 
     .content-area {
       flex: 1;
       overflow-y: auto;
-      padding-bottom: 90px;
+      padding-bottom: 80px;
     }
 
     .calendar-card {
       background: var(--card-bg);
       margin: 16px;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border-top: 4px solid var(--primary-ocre);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      border: 1px solid var(--border-color);
     }
 
     .calendar-grid {
@@ -124,8 +137,8 @@
     .grid-day-name {
       font-size: 0.75rem;
       color: var(--text-muted);
-      font-weight: 700;
-      padding-bottom: 8px;
+      font-weight: 800;
+      padding-bottom: 10px;
     }
 
     .grid-day-cell {
@@ -134,139 +147,121 @@
       align-items: center;
       justify-content: center;
       font-size: 0.95rem;
-      font-weight: 500;
+      font-weight: 600;
       border-radius: 50%;
-      color: var(--text-muted);
+      color: #cbd5e1;
       pointer-events: none;
-      opacity: 0.4;
     }
 
     .grid-day-cell.has-event {
-      background-color: var(--primary-ocre);
+      background-color: var(--primary-yellow);
       color: var(--text-dark);
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       pointer-events: auto;
-      opacity: 1;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(255, 198, 0, 0.4);
     }
 
     .grid-day-cell.selected {
-      box-shadow: 0 0 0 2px var(--text-dark), 0 0 0 4px var(--primary-ocre);
+      outline: 3px solid var(--text-dark);
+      outline-offset: 1px;
     }
 
     .selected-events-container {
-      padding: 0 16px;
+      padding: 0 16px 16px 16px;
     }
 
+    .event-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      border-left: 6px solid var(--primary-yellow);
+      border-top: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .event-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+
+    /* Disseny de detalls amb fons groc net */
+    .event-details-grid {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .detail-box {
+      background-color: var(--yellow-light);
+      border: 1px solid var(--yellow-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .detail-label {
+      font-size: 0.7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #854d0e;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.3;
+    }
+
+    /* Vista Llista */
     .day-row {
       display: flex;
-      padding: 12px 20px 0 20px;
-      position: relative;
+      padding: 14px 16px 0 16px;
     }
 
     .date-col {
-      width: 60px;
+      width: 55px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      position: relative;
+      flex-shrink: 0;
     }
 
     .day-num {
-      font-size: 1.3rem;
-      font-weight: 700;
+      font-size: 1.4rem;
+      font-weight: 900;
       color: var(--text-dark);
       line-height: 1;
     }
 
     .day-name {
       font-size: 0.7rem;
-      font-weight: 500;
+      font-weight: 800;
       color: var(--text-muted);
       text-transform: uppercase;
-      margin-top: 2px;
-    }
-
-    .timeline-indicator {
-      position: absolute;
-      right: 12px;
-      top: 6px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--primary-ocre);
-      z-index: 2;
-    }
-
-    .timeline-line {
-      position: absolute;
-      right: 15px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background-color: var(--border-color);
-      z-index: 1;
+      margin-top: 4px;
     }
 
     .events-col {
       flex: 1;
-      padding-left: 15px;
-    }
-
-    .event-card {
-      background: var(--card-bg);
-      border-radius: 8px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-      border-left: 4px solid var(--primary-ocre);
-    }
-
-    .event-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text-dark);
-    }
-
-    .event-details {
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px dashed var(--border-color);
-      font-size: 0.85rem;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 12px;
-    }
-
-    .detail-key {
-      font-weight: 700;
-      color: var(--text-dark);
-      text-transform: capitalize;
-      font-size: 0.8rem;
-      opacity: 0.85;
-      flex-shrink: 0;
-    }
-
-    .detail-value {
-      color: #4a5568;
-      text-align: right;
-      font-weight: 400;
-      word-break: break-word;
     }
 
     .empty-state {
       text-align: center;
-      padding: 30px 20px;
+      padding: 40px 20px;
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      font-weight: 500;
     }
 
     .bottom-bar {
@@ -274,21 +269,18 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      background: var(--card-bg);
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
+      background: var(--primary-yellow);
       z-index: 20;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
     }
 
     .banner-text {
-      background-color: var(--primary-ocre);
       color: var(--text-dark);
       text-align: center;
-      padding: 8px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 1px;
+      padding: 12px;
+      font-size: 0.9rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
     }
   </style>
@@ -352,7 +344,7 @@
       const data = await response.json();
 
       if (data.error) {
-        document.getElementById("mainContent").innerHTML = `<div class="empty-state" style="color:#d9534f; font-weight:bold;">Error API Google: ${data.error.message}</div>`;
+        document.getElementById("mainContent").innerHTML = `<div class="empty-state" style="color:#e11d48; font-weight:bold;">Error API Google: ${data.error.message}</div>`;
         return;
       }
 
@@ -503,8 +495,6 @@
           <div class="date-col">
             <div class="day-num">${dayStr}</div>
             <div class="day-name">${dayName}</div>
-            <div class="timeline-indicator"></div>
-            <div class="timeline-line"></div>
           </div>
           <div class="events-col">
             ${generateEventsListHtml(dayEvents)}
@@ -516,57 +506,83 @@
     }
 
     if (!hasAnyEventsInMonth) {
-      container.innerHTML = `<div class="empty-state">No hi ha cap esdeveniment trobat per a aquest mes.</div>`;
+      container.innerHTML = `<div class="empty-state">No hi ha cap esdeveniment per a aquest mes.</div>`;
     }
   }
 
-  // Aquesta és la funció encarregada de processar el JSON de la descripció
+  // Funció de neteja profunda i parsejat JSON millorat
   function generateEventsListHtml(events) {
     let html = "";
-    events.forEach(ev => {
-      // 1. Convertim etiquetes HTML de salt de línia en espais
-      let cleanDescription = ev.descriptionRaw
-        .replace(/<br\s*[\/]?>/gi, "\n")
-        .replace(/<\/p><p>/gi, "\n")
-        .replace(/<\/?[^>]+(>|$)/g, "");
 
-      // 2. Traiem espais d'amplada zero i espais no-trencables que afegeix Google
-      cleanDescription = cleanDescription
+    events.forEach(ev => {
+      let raw = ev.descriptionRaw;
+
+      // 1. Convertim blocs d'etiquetes en salts de línia
+      raw = raw.replace(/<\/p>/gi, "\n").replace(/<br\s*[\/]?>/gi, "\n");
+
+      // 2. Netegem TOTES les etiquetes HTML i entitats especials
+      let cleanText = raw.replace(/<\/?[^>]+(>|$)/g, "");
+      
+      // 3. Substituïm espais d'amplada zero, &nbsp;, \xa0 i cometes tipogràfiques
+      cleanText = cleanText
         .replace(/&nbsp;/g, " ")
         .replace(/\u00a0/g, " ")
         .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .replace(/”|“/g, '"')
         .trim();
 
-      let detailsFormatted = "";
+      let detailsHtml = "";
 
-      if (cleanDescription) {
-        try {
-          const fields = JSON.parse(cleanDescription);
-          
-          detailsFormatted = `<div class="event-details">`;
-          for (const [k, v] of Object.entries(fields)) {
-            const formattedKey = k.replace(/_/g, " ");
-            detailsFormatted += `
-              <div class="detail-row">
-                <span class="detail-key">${formattedKey}:</span> 
-                <span class="detail-value">${v}</span>
+      if (cleanText) {
+        // Intentem extreure un JSON validant la posició de les claus { }
+        const firstBrace = cleanText.indexOf('{');
+        const lastBrace = cleanText.lastIndexOf('}');
+
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          const jsonSubstring = cleanText.substring(firstBrace, lastBrace + 1);
+
+          try {
+            const parsedData = JSON.parse(jsonSubstring);
+            
+            detailsHtml = `<div class="event-details-grid">`;
+            for (const [key, val] of Object.entries(parsedData)) {
+              const label = key.replace(/_/g, " ");
+              detailsHtml += `
+                <div class="detail-box">
+                  <span class="detail-label">${label}</span>
+                  <span class="detail-value">${val}</span>
+                </div>
+              `;
+            }
+            detailsHtml += `</div>`;
+          } catch (e) {
+            // S'executa si falla la conversió a JSON
+            detailsHtml = `
+              <div class="event-details-grid">
+                <div class="detail-box">
+                  <span class="detail-value">${cleanText}</span>
+                </div>
               </div>`;
           }
-          detailsFormatted += `</div>`;
-        } catch(e) {
-          detailsFormatted = `<div class="event-details"><div class="detail-value">${cleanDescription}</div></div>`;
+        } else {
+          // Si no té format JSON (text normal)
+          detailsHtml = `
+            <div class="event-details-grid">
+              <div class="detail-box">
+                <span class="detail-value">${cleanText}</span>
+              </div>
+            </div>`;
         }
       }
 
       html += `
         <div class="event-card">
-          <div class="event-header">
-            <span class="event-title">${ev.titol}</span>
-          </div>
-          ${detailsFormatted}
+          <div class="event-title">${ev.titol}</div>
+          ${detailsHtml}
         </div>
       `;
     });
+
     return html;
   }
 
