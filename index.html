@@ -42,7 +42,7 @@
       position: relative;
     }
 
-    /* Top Navigation Header */
+    /* Header superior */
     .top-header {
       background: var(--card-bg);
       display: flex;
@@ -55,7 +55,9 @@
     .nav-controls {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      width: 100%;
+      justify-content: space-between;
     }
 
     .nav-title {
@@ -67,14 +69,14 @@
     .nav-btn {
       background: none;
       border: none;
-      font-size: 1rem;
+      font-size: 1.2rem;
       color: var(--text-dark);
       cursor: pointer;
       font-weight: bold;
-      padding: 0 4px;
+      padding: 0 8px;
     }
 
-    /* Sub-header amb selector de vista */
+    /* Selector de vista */
     .view-selector-bar {
       display: flex;
       background: var(--card-bg);
@@ -99,14 +101,14 @@
       border-bottom-color: var(--primary-ocre);
     }
 
-    /* Àrea de contingut general */
+    /* Àrea de contingut */
     .content-area {
       flex: 1;
       overflow-y: auto;
       padding-bottom: 90px;
     }
 
-    /* === VISTA CALENDARI (GRAELLA) === */
+    /* Vista Calendari */
     .calendar-card {
       background: var(--card-bg);
       margin: 16px;
@@ -139,26 +141,29 @@
       font-weight: 500;
       border-radius: 50%;
       color: var(--text-muted);
-      pointer-events: none; /* Per defecte deshabilitats */
+      pointer-events: none;
       opacity: 0.4;
     }
 
-    /* Dies actius (amb esdeveniment) */
     .grid-day-cell.has-event {
       background-color: var(--primary-ocre);
       color: var(--text-dark);
       font-weight: 700;
       cursor: pointer;
-      pointer-events: auto; /* Es poden clicar */
+      pointer-events: auto;
       opacity: 1;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .grid-day-cell.selected {
+      box-shadow: 0 0 0 2px var(--text-dark), 0 0 0 4px var(--primary-ocre);
     }
 
     .selected-events-container {
       padding: 0 16px;
     }
 
-    /* === VISTA LLISTA (TIMELINE) === */
+    /* Vista Llista (Timeline) */
     .day-row {
       display: flex;
       padding: 12px 20px 0 20px;
@@ -223,21 +228,10 @@
       border-left: 4px solid var(--primary-ocre);
     }
 
-    .event-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
     .event-title {
       font-size: 0.95rem;
       font-weight: 700;
       color: var(--text-dark);
-    }
-
-    .event-time {
-      font-size: 0.75rem;
-      color: var(--text-muted);
     }
 
     .event-details {
@@ -258,7 +252,7 @@
       font-size: 0.9rem;
     }
 
-    /* Barra inferior fixada */
+    /* Banner inferior fixat */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -286,64 +280,79 @@
 <body>
 
 <div class="app-container">
-  <!-- Capçalera amb canvi de mes -->
   <div class="top-header">
     <div class="nav-controls">
       <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
-      <div class="nav-title" id="monthDisplay">Octubre 2026</div>
+      <div class="nav-title" id="monthDisplay">Carregant...</div>
       <button class="nav-btn" onclick="changeMonth(1)">&gt;</button>
     </div>
   </div>
 
-  <!-- Selector de Vista -->
   <div class="view-selector-bar">
     <div class="view-tab active" id="tabCalendar" onclick="switchView('calendar')">Vista Calendari</div>
     <div class="view-tab" id="tabList" onclick="switchView('list')">Vista Llista</div>
   </div>
 
-  <!-- Àrea de Contingut Dibuixat Dinàmicament -->
-  <div class="content-area" id="mainContent"></div>
+  <div class="content-area" id="mainContent">
+    <div class="empty-state">Carregant esdeveniments de Google Calendar...</div>
+  </div>
 
-  <!-- Banner inferior fixat -->
   <div class="bottom-bar">
     <div class="banner-text">Fal·lera Gironina</div>
   </div>
 </div>
 
 <script>
-  // Dades d'exemple d'esdeveniments
-  const eventsData = {
-    "2026-10-23": [
-      {
-        titol: "INAUGURACIÓ FIRES",
-        descriptionRaw: JSON.stringify({
-          "hora_plantada": "16:00h",
-          "lloc_plantada": "Plaça Hotel Carlemany",
-          "inici_cercavila": "17:30h",
-          "recorregut": "Plaça Hotel Carlemany, Joan Maragall, Plaça Catalunya, Plaça del Vi",
-          "prego": "20:00h",
-          "balls": "21:00h"
-        })
-      }
-    ],
-    "2026-10-24": [
-      {
-        titol: "Cercavila de Matinades",
-        descriptionRaw: "Matinades pels carrers del barri vell."
-      }
-    ]
-  };
+  const API_KEY = "AIzaSyDu9KdgDjl34V_1vnKaBCfttsP0TD8sFQ";
+  const CALENDAR_ID = "fd6ecb65a2fb197af285eaca224d7b71400dc26aeaf16fd77aa3f97086b466a@group.calendar.google.com";
 
   let currentYear = 2026;
-  let currentMonth = 9; // Octubre (0-indexed: 9 = Octubre)
-  let activeView = "calendar"; // 'calendar' o 'list'
+  let currentMonth = 9; // Octubre (0-indexed)
+  let activeView = "calendar";
   let selectedDateKey = null;
+  let eventsData = {};
 
   const monthNames = [
     "Gener", "Febrer", "Març", "Abril", "Maig", "Juny", 
     "Juliol", "Agost", "Setembre", "Octubre", "Novembre", "Desembre"
   ];
   const daysNames = ["DIU", "DILL", "DIM", "DMC", "DIJ", "DIV", "DISS"];
+
+  async function fetchCalendarEvents() {
+    document.getElementById("mainContent").innerHTML = `<div class="empty-state">Carregant esdeveniments...</div>`;
+    
+    const timeMin = new Date(currentYear, currentMonth, 1).toISOString();
+    const timeMax = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59).toISOString();
+
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      eventsData = {};
+
+      if (data.items) {
+        data.items.forEach(item => {
+          const start = item.start.date || item.start.dateTime;
+          if (start) {
+            const dateKey = start.split("T")[0];
+            if (!eventsData[dateKey]) eventsData[dateKey] = [];
+
+            eventsData[dateKey].push({
+              titol: item.summary || "Sense títol",
+              descriptionRaw: item.description || ""
+            });
+          }
+        });
+      }
+
+      renderView();
+    } catch (error) {
+      console.error("Error carregant esdeveniments:", error);
+      document.getElementById("mainContent").innerHTML = `<div class="empty-state">Error en carregar les dades de Google Calendar.</div>`;
+    }
+  }
 
   function updateHeader() {
     document.getElementById("monthDisplay").innerText = `${monthNames[currentMonth]} ${currentYear}`;
@@ -353,7 +362,7 @@
     activeView = view;
     document.getElementById("tabCalendar").classList.toggle("active", view === "calendar");
     document.getElementById("tabList").classList.toggle("active", view === "list");
-    selectedDateKey = null; // Reinicia selecció de dia en canviar de vista
+    selectedDateKey = null;
     renderView();
   }
 
@@ -368,7 +377,7 @@
     }
     selectedDateKey = null;
     updateHeader();
-    renderView();
+    fetchCalendarEvents();
   }
 
   function renderView() {
@@ -383,7 +392,6 @@
     }
   }
 
-  /* RENDERITZACIÓ DE LA VISTA CALENDARI */
   function renderCalendarView(container) {
     const card = document.createElement("div");
     card.className = "calendar-card";
@@ -391,7 +399,6 @@
     const grid = document.createElement("div");
     grid.className = "calendar-grid";
 
-    // Dies de la setmana
     const weekDays = ["Dl", "Dt", "Dc", "Dj", "Dv", "Ds", "Dg"];
     weekDays.forEach(d => {
       const el = document.createElement("div");
@@ -417,9 +424,10 @@
       cell.className = "grid-day-cell";
       cell.innerText = day;
 
-      // Només si té esdeveniments es pot seleccionar
       if (eventsData[dateKey] && eventsData[dateKey].length > 0) {
         cell.classList.add("has-event");
+        if (dateKey === selectedDateKey) cell.classList.add("selected");
+
         cell.onclick = () => {
           selectedDateKey = dateKey;
           renderView();
@@ -432,16 +440,14 @@
     card.appendChild(grid);
     container.appendChild(card);
 
-    // Si hi ha un dia seleccionat, mostra els esdeveniments a sota
     if (selectedDateKey && eventsData[selectedDateKey]) {
       const eventsContainer = document.createElement("div");
       eventsContainer.className = "selected-events-container";
-      eventsContainer.innerHTML = generateEventsListHtml(selectedDateKey, eventsData[selectedDateKey]);
+      eventsContainer.innerHTML = generateEventsListHtml(eventsData[selectedDateKey]);
       container.appendChild(eventsContainer);
     }
   }
 
-  /* RENDERITZACIÓ DE LA VISTA LLISTA (NOMÉS DIES AMB ESDEVENIMENTS) */
   function renderListView(container) {
     const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
     let hasAnyEventsInMonth = false;
@@ -453,7 +459,6 @@
 
       const dayEvents = eventsData[dateKey];
 
-      // Oculta els dies sense esdeveniments
       if (dayEvents && dayEvents.length > 0) {
         hasAnyEventsInMonth = true;
         const dateObj = new Date(currentYear, currentMonth, day);
@@ -470,7 +475,7 @@
             <div class="timeline-line"></div>
           </div>
           <div class="events-col">
-            ${generateEventsListHtml(dateKey, dayEvents)}
+            ${generateEventsListHtml(dayEvents)}
           </div>
         `;
 
@@ -483,20 +488,24 @@
     }
   }
 
-  /* GENERADOR DE TARGETES D'ESDEVENIMENT */
-  function generateEventsListHtml(dateKey, events) {
+  function generateEventsListHtml(events) {
     let html = "";
     events.forEach(ev => {
+      let cleanDescription = ev.descriptionRaw
+        .replace(/<br\s*[\/]?>/gi, "")
+        .replace(/<\/?[^>]+(>|$)/g, "")
+        .trim();
+
       let detailsFormatted = "";
       try {
-        const fields = JSON.parse(ev.descriptionRaw);
+        const fields = JSON.parse(cleanDescription);
         detailsFormatted = `<div class="event-details">`;
         for (const [k, v] of Object.entries(fields)) {
           detailsFormatted += `<div class="detail-row"><span class="detail-key">${k.replace(/_/g, " ")}:</span> ${v}</div>`;
         }
         detailsFormatted += `</div>`;
       } catch(e) {
-        detailsFormatted = `<div class="event-details">${ev.descriptionRaw}</div>`;
+        detailsFormatted = cleanDescription ? `<div class="event-details">${cleanDescription}</div>` : "";
       }
 
       html += `
@@ -511,8 +520,8 @@
     return html;
   }
 
-  // Inicialització
-  renderView();
+  // Càrrega inicial
+  fetchCalendarEvents();
 </script>
 
 </body>
