@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendari Fires</title>
+  <title>Calendari Fires - Fal·lera Gironina</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -161,7 +161,6 @@
       outline-offset: 1px;
     }
 
-    /* Targetes de la vista de Llista / Seleccionats */
     .day-row {
       display: flex;
       gap: 12px;
@@ -225,13 +224,12 @@
       color: #ffffff;
     }
 
-    /* Paleta de colors idèntica a la imatge */
-    .color-1 { background-color: #105d6e; } /* Blau petroli */
-    .color-2 { background-color: #276b3c; } /* Verd obscur */
-    .color-3 { background-color: #c98a0c; } /* Groc-marró */
-    .color-4 { background-color: #43658b; } /* Blau grisós */
-    .color-5 { background-color: #b85b4f; } /* Vermell terracota */
-    .color-6 { background-color: #551d53; } /* Llavanda/Lila obscur */
+    .color-1 { background-color: #105d6e; }
+    .color-2 { background-color: #276b3c; }
+    .color-3 { background-color: #c98a0c; }
+    .color-4 { background-color: #43658b; }
+    .color-5 { background-color: #b85b4f; }
+    .color-6 { background-color: #551d53; }
 
     .detail-label {
       font-size: 0.68rem;
@@ -247,6 +245,22 @@
       line-height: 1.35;
     }
 
+    /* Vista del Formulari integrat */
+    .form-frame-container {
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
     .empty-state {
       text-align: center;
       padding: 40px 20px;
@@ -255,7 +269,6 @@
       font-weight: 600;
     }
 
-    /* Barra Inferior amb dos Botons */
     .bottom-bar {
       position: absolute;
       bottom: 0;
@@ -285,15 +298,16 @@
       transition: opacity 0.2s;
     }
 
-    .bottom-btn:active {
-      opacity: 0.85;
+    .bottom-btn.active-btn {
+      background: #1e293b;
+      outline: 2px solid #ffffff;
     }
   </style>
 </head>
 <body>
 
 <div class="app-container">
-  <div class="top-header">
+  <div class="top-header" id="topHeader">
     <div class="nav-controls">
       <button class="nav-btn" onclick="changeMonth(-1)">&lt;</button>
       <div class="nav-title" id="monthDisplay">Carregant...</div>
@@ -301,24 +315,27 @@
     </div>
   </div>
 
-  <div class="view-selector-bar">
+  <div class="view-selector-bar" id="viewBar">
     <div class="view-tab active" id="tabCalendar" onclick="switchView('calendar')">Vista Calendari</div>
     <div class="view-tab" id="tabList" onclick="switchView('list')">Vista Llista</div>
   </div>
 
   <div class="content-area" id="mainContent">
-    <div class="empty-state">Carregant esdeveniments de Google Calendar...</div>
+    <div class="empty-state">Carregant esdeveniments...</div>
   </div>
 
   <div class="bottom-bar">
-    <button class="bottom-btn" onclick="switchView('calendar')">CALENDARI</button>
-    <button class="bottom-btn" onclick="switchView('list')">CERCAVILA</button>
+    <button class="bottom-btn active-btn" id="btnCalNav" onclick="switchView('calendar')">CALENDARI</button>
+    <button class="bottom-btn" id="btnFormNav" onclick="switchView('form')">CERCAVILA</button>
   </div>
 </div>
 
 <script>
   const API_KEY = "AIzaSyAgw7NMentR5EuYyyu9wnGnNJyMz5HPpEs";
   const CALENDAR_ID = "fd6ecb65a2fb197af285eaca224d7b71400dc26aeafe16fd77aa3f97086b466a@group.calendar.google.com";
+
+  // URL del formulari actiu
+  let CURRENT_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdQnXiAl8zhmwE0qwzm9a7SaFqA5NcdniChsNN093GB39yflA/viewform?embedded=true";
 
   const today = new Date();
   let currentYear = today.getFullYear();
@@ -336,6 +353,8 @@
   const colorClasses = ["color-1", "color-2", "color-3", "color-4", "color-5", "color-6"];
 
   async function fetchCalendarEvents() {
+    if (activeView === 'form') return;
+
     document.getElementById("mainContent").innerHTML = `<div class="empty-state">Carregant esdeveniments...</div>`;
     
     const startDate = new Date(currentYear, currentMonth, 1, 0, 0, 0);
@@ -391,8 +410,27 @@
 
   function switchView(view) {
     activeView = view;
-    document.getElementById("tabCalendar").classList.toggle("active", view === "calendar");
-    document.getElementById("tabList").classList.toggle("active", view === "list");
+    
+    const topHeader = document.getElementById("topHeader");
+    const viewBar = document.getElementById("viewBar");
+    const btnCalNav = document.getElementById("btnCalNav");
+    const btnFormNav = document.getElementById("btnFormNav");
+
+    if (view === 'form') {
+      topHeader.style.display = 'none';
+      viewBar.style.display = 'none';
+      btnCalNav.classList.remove('active-btn');
+      btnFormNav.classList.add('active-btn');
+    } else {
+      topHeader.style.display = 'flex';
+      viewBar.style.display = 'flex';
+      btnCalNav.classList.add('active-btn');
+      btnFormNav.classList.remove('active-btn');
+      
+      document.getElementById("tabCalendar").classList.toggle("active", view === "calendar");
+      document.getElementById("tabList").classList.toggle("active", view === "list");
+    }
+
     selectedDateKey = null;
     renderView();
   }
@@ -412,15 +450,25 @@
   }
 
   function renderView() {
-    updateHeader();
     const container = document.getElementById("mainContent");
     container.innerHTML = "";
 
     if (activeView === "calendar") {
+      updateHeader();
       renderCalendarView(container);
-    } else {
+    } else if (activeView === "list") {
+      updateHeader();
       renderListView(container);
+    } else if (activeView === "form") {
+      renderFormView(container);
     }
+  }
+
+  function renderFormView(container) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "form-frame-container";
+    wrapper.innerHTML = `<iframe class="form-iframe" src="${CURRENT_FORM_URL}" frameborder="0" marginheight="0" marginwidth="0">Carregant formulari...</iframe>`;
+    container.appendChild(wrapper);
   }
 
   function renderCalendarView(container) {
